@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>크로아티아 7박8일 — 통합 여행 노트</title>
 <script>
-  window.GMAPS_LAST_UPDATED = "2026년 9월 26일 07:31";
+  window.GMAPS_LAST_UPDATED = "2026년 9월 26일 07:45";
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -670,7 +670,20 @@ let gMap = null;
 let gMarkers = [];
 const activeCats = new Set(Object.keys(CAT_COLOR));
 
-function initMasterMap(){
+// 출발(자그레브 공항) → 종료(두브로브니크 공항)까지의 이동 순서 (화살표 동선용 대표 지점)
+const ROUTE_PATH = [
+  {lat:45.7429, lng:16.0688}, // 자그레브 공항 (출발)
+  {lat:45.8081, lng:15.9793}, // 자그레브 시내
+  {lat:45.1101, lng:15.5761}, // 라스토케
+  {lat:44.8809, lng:15.5972}, // 플리트비체
+  {lat:44.1175, lng:15.2280}, // 자다르
+  {lat:43.5083, lng:16.4373}, // 스플리트
+  {lat:42.8503, lng:17.6981}, // 말리 스톤
+  {lat:42.6420, lng:18.1067}, // 두브로브니크 시내
+  {lat:42.5614, lng:18.2682}, // 두브로브니크 공항 (종료)
+];
+
+async function initMasterMap(){
   gMap = new google.maps.Map(document.getElementById('masterMap'), {
     zoom: 8,
     center: {lat:44.3, lng:16.5},
@@ -681,40 +694,61 @@ function initMasterMap(){
     mapTypeControl: false
   });
 
+  // 출발→종료 이동 동선을 화살표로 표시
+  const arrowSymbol = { path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW, scale:3.4, strokeColor:"#C99A3E", fillColor:"#C99A3E", fillOpacity:1 };
+  new google.maps.Polyline({
+    path: ROUTE_PATH,
+    geodesic: true,
+    strokeColor: "#C99A3E",
+    strokeOpacity: 0.85,
+    strokeWeight: 3,
+    icons: [{ icon: arrowSymbol, offset: "0%", repeat: "85px" }],
+    map: gMap
+  });
+  new google.maps.Marker({ position: ROUTE_PATH[0], map: gMap, label:{text:"출발", color:"#0F3559", fontWeight:"700", fontSize:"11px"}, icon:{path:google.maps.SymbolPath.CIRCLE, scale:0.1, fillOpacity:0, strokeOpacity:0}, zIndex:1 });
+  new google.maps.Marker({ position: ROUTE_PATH[ROUTE_PATH.length-1], map: gMap, label:{text:"도착", color:"#0F3559", fontWeight:"700", fontSize:"11px"}, icon:{path:google.maps.SymbolPath.CIRCLE, scale:0.1, fillOpacity:0, strokeOpacity:0}, zIndex:1 });
+
+  const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
+
   const bounds = new google.maps.LatLngBounds();
   gMarkers = STAYS.map(s => {
-    const marker = new google.maps.Marker({
+    const color = CAT_COLOR[s.cat];
+    const pin = document.createElement('div');
+    pin.style.cssText = "display:flex;align-items:center;gap:5px;cursor:pointer;";
+    pin.innerHTML = `
+      <div style="width:32px;height:32px;border-radius:50%;background:${color};color:#fff;
+        display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;
+        border:2.5px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.35);font-family:'Noto Serif KR',serif;
+        flex:none;">${s.day}</div>
+      <div style="background:rgba(255,252,246,0.95);border:1px solid ${color};border-radius:7px;
+        padding:3px 8px;font-size:11.5px;font-weight:700;color:#20242B;white-space:nowrap;
+        box-shadow:0 1px 4px rgba(0,0,0,.18);font-family:'Noto Sans KR',sans-serif;">${s.name}</div>`;
+
+    const marker = new AdvancedMarkerElement({
       position: {lat:s.lat, lng:s.lng},
       map: gMap,
       title: s.name,
-      icon: {
-        path: google.maps.SymbolPath.CIRCLE,
-        fillColor: CAT_COLOR[s.cat],
-        fillOpacity: 1,
-        strokeColor: "#fff",
-        strokeWeight: 2,
-        scale: 9
-      },
-      label: { text: String(s.day), color:"#fff", fontSize:"10px", fontWeight:"700" }
+      content: pin,
+      zIndex: 100 + s.day
     });
     const info = new google.maps.InfoWindow({
       content: `<div style="font-family:'Noto Sans KR',sans-serif;max-width:220px;">
-        <div style="font-size:10.5px;color:${CAT_COLOR[s.cat]};font-weight:700;margin-bottom:2px;">D${s.day} · ${CAT_LABEL[s.cat]}</div>
+        <div style="font-size:10.5px;color:${color};font-weight:700;margin-bottom:2px;">D${s.day} · ${CAT_LABEL[s.cat]}</div>
         <div style="font-size:13.5px;font-weight:700;margin-bottom:3px;">${s.name}</div>
         <div style="font-size:11.5px;color:#555;margin-bottom:4px;">${s.desc||''}</div>
         <div style="font-size:11px;color:#888;">${s.addr}</div>
       </div>`
     });
-    marker.addListener('click', () => info.open(gMap, marker));
+    marker.addListener('click', () => info.open({anchor:marker, map:gMap}));
     marker._cat = s.cat; marker._day = s.day; marker._info = info;
-    bounds.extend(marker.getPosition());
+    bounds.extend({lat:s.lat, lng:s.lng});
     return marker;
   });
   gMap.fitBounds(bounds, 40);
 }
 
 function applyLegendFilter(){
-  gMarkers.forEach(m => m.setMap(activeCats.has(m._cat) ? gMap : null));
+  gMarkers.forEach(m => { m.map = activeCats.has(m._cat) ? gMap : null; });
 }
 
 document.getElementById('legendRow').addEventListener('click', (e) => {
@@ -732,10 +766,10 @@ function focusDay(n){
   const dayMarkers = gMarkers.filter(m => m._day === n);
   if(!dayMarkers.length) return;
   const bounds = new google.maps.LatLngBounds();
-  dayMarkers.forEach(m => bounds.extend(m.getPosition()));
+  dayMarkers.forEach(m => bounds.extend(m.position));
   gMap.fitBounds(bounds, 60);
-  if(gMap.getZoom() > 14) gMap.setZoom(14);
-  setTimeout(() => dayMarkers[0]._info.open(gMap, dayMarkers[0]), 400);
+  setTimeout(() => { if(gMap.getZoom() > 14) gMap.setZoom(14); }, 300);
+  setTimeout(() => dayMarkers[0]._info.open({anchor:dayMarkers[0], map:gMap}), 450);
 }
 
 // generic copy handler for both master table and inline addr-rows
