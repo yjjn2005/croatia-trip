@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>크로아티아 7박8일 — 통합 여행 노트</title>
 <script>
-  window.GMAPS_LAST_UPDATED = "2026년 9월 26일 07:45";
+  window.GMAPS_LAST_UPDATED = "2026년 9월 26일 07:52";
 </script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -183,7 +183,7 @@ footer{padding:26px 20px 40px;text-align:center;font-size:11.5px;color:#8b8a80;}
   background:var(--white);border-radius:20px;padding:6px 12px 6px 8px;cursor:pointer;user-select:none;
   color:var(--ink); transition:opacity .15s;
 }
-.legend-chip .sw{width:11px;height:11px;border-radius:50%;flex:none;}
+.legend-chip .sw{width:16px;height:16px;border-radius:4px 4px 4px 0;flex:none;display:flex;align-items:center;justify-content:center;color:#fff;font-size:9.5px;font-weight:700;font-family:"Noto Sans KR",sans-serif;}
 .legend-chip.off{opacity:0.35;}
 .mastermap-box{border-radius:16px;overflow:hidden;border:1px solid var(--line);height:420px;box-shadow:0 8px 24px rgba(15,53,89,0.08);}
 .mastermap-box #masterMap{width:100%;height:100%;}
@@ -264,11 +264,11 @@ footer{padding:26px 20px 40px;text-align:center;font-size:11.5px;color:#8b8a80;}
       <p>손가락으로 확대·축소·좌우 이동이 가능합니다. 칩을 눌러 숙소·맛집·관광스팟·공항·대중교통을 원하는 대로 켜고 끌 수 있고, 위 숫자 버튼(1~8)을 누르면 해당 일자 구간으로 지도가 바로 이동합니다.</p>
     </div>
     <div class="legend-row" id="legendRow">
-      <span class="legend-chip" data-type="hotel"><span class="sw" style="background:#0F3559"></span>숙소</span>
-      <span class="legend-chip" data-type="food"><span class="sw" style="background:#BC5B39"></span>맛집</span>
-      <span class="legend-chip" data-type="spot"><span class="sw" style="background:#5B6B4F"></span>관광스팟</span>
-      <span class="legend-chip" data-type="airport"><span class="sw" style="background:#C99A3E"></span>공항</span>
-      <span class="legend-chip" data-type="transit"><span class="sw" style="background:#7A7A72"></span>대중교통·경유지</span>
+      <span class="legend-chip" data-type="hotel"><span class="sw" style="background:#0F3559">H</span>숙소</span>
+      <span class="legend-chip" data-type="food"><span class="sw" style="background:#BC5B39">E</span>맛집</span>
+      <span class="legend-chip" data-type="spot"><span class="sw" style="background:#5B6B4F">P</span>관광스팟</span>
+      <span class="legend-chip" data-type="airport"><span class="sw" style="background:#C99A3E">A</span>공항</span>
+      <span class="legend-chip" data-type="transit"><span class="sw" style="background:#7A7A72">T</span>대중교통·경유지</span>
     </div>
     <div class="mastermap-box"><div id="masterMap"></div></div>
     <p class="map-hint">지도 로딩에 잠시 시간이 걸릴 수 있습니다. 마커를 누르면 이름·주소·설명이 표시됩니다.</p>
@@ -646,6 +646,7 @@ const STAYS = [
 
 const CAT_COLOR = {hotel:"#0F3559", food:"#BC5B39", spot:"#5B6B4F", airport:"#C99A3E", transit:"#7A7A72"};
 const CAT_LABEL = {hotel:"숙소", food:"맛집", spot:"관광스팟", airport:"공항", transit:"대중교통·경유지"};
+const CAT_LETTER = {hotel:"H", food:"E", spot:"P", airport:"A", transit:"T"};
 
 function mapUrl(addr){ return "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(addr); }
 
@@ -713,16 +714,19 @@ async function initMasterMap(){
   const bounds = new google.maps.LatLngBounds();
   gMarkers = STAYS.map(s => {
     const color = CAT_COLOR[s.cat];
+    const letter = CAT_LETTER[s.cat];
     const pin = document.createElement('div');
-    pin.style.cssText = "display:flex;align-items:center;gap:5px;cursor:pointer;";
+    pin.style.cssText = "display:flex;align-items:flex-end;gap:4px;cursor:pointer;";
     pin.innerHTML = `
-      <div style="width:32px;height:32px;border-radius:50%;background:${color};color:#fff;
-        display:flex;align-items:center;justify-content:center;font-weight:700;font-size:15px;
-        border:2.5px solid #fff;box-shadow:0 2px 6px rgba(0,0,0,.35);font-family:'Noto Serif KR',serif;
-        flex:none;">${s.day}</div>
-      <div style="background:rgba(255,252,246,0.95);border:1px solid ${color};border-radius:7px;
+      <svg width="30" height="38" viewBox="0 0 30 38" style="flex:none;filter:drop-shadow(0 2px 3px rgba(0,0,0,.4));">
+        <line x1="4" y1="6" x2="4" y2="36" stroke="#3a3a34" stroke-width="2.2"/>
+        <circle cx="4" cy="36.5" r="2.2" fill="#3a3a34"/>
+        <path d="M4 4 L27 4 L20 12 L27 20 L4 20 Z" fill="${color}" stroke="#fff" stroke-width="1.6"/>
+        <text x="14" y="16" font-size="12" font-weight="700" fill="#fff" font-family="'Noto Sans KR',sans-serif" text-anchor="middle">${letter}</text>
+      </svg>
+      <div style="background:rgba(255,252,246,0.96);border:1px solid ${color};border-radius:7px;
         padding:3px 8px;font-size:11.5px;font-weight:700;color:#20242B;white-space:nowrap;
-        box-shadow:0 1px 4px rgba(0,0,0,.18);font-family:'Noto Sans KR',sans-serif;">${s.name}</div>`;
+        box-shadow:0 1px 4px rgba(0,0,0,.18);font-family:'Noto Sans KR',sans-serif;margin-bottom:8px;">D${s.day} · ${s.name}</div>`;
 
     const marker = new AdvancedMarkerElement({
       position: {lat:s.lat, lng:s.lng},
