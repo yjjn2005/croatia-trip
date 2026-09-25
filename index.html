@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>크로아티아 7박8일 — 통합 여행 노트</title>
+<script>
+  window.GMAPS_LAST_UPDATED = "2026년 9월 26일 07:31";
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@500;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
@@ -156,14 +159,59 @@ section.alt{background:var(--white);}
 
 footer{padding:26px 20px 40px;text-align:center;font-size:11.5px;color:#8b8a80;}
 
+/* ===== luxury refinements ===== */
+.update-badge{
+  display:inline-flex;align-items:center;gap:7px;font-size:11.5px;color:#B9C7D6;
+  border:1px solid rgba(201,154,62,0.5);border-radius:20px;padding:5px 12px 5px 10px;margin-bottom:16px;
+}
+.update-badge .dot{width:6px;height:6px;border-radius:50%;background:var(--gold);flex:none;}
+
+/* day quick-nav pills */
+.day-pillnav{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px;}
+.day-pill{
+  font-family:"Noto Serif KR",serif;font-weight:700;font-size:13px;
+  width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,0.06);border:1px solid rgba(201,154,62,0.55);color:#F1E9DA;
+  text-decoration:none;flex:none;transition:background .15s;
+}
+.day-pill:active{background:var(--gold);color:var(--navy);}
+
+/* master map */
+.legend-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;}
+.legend-chip{
+  display:inline-flex;align-items:center;gap:6px;font-size:12px;border:1px solid var(--line);
+  background:var(--white);border-radius:20px;padding:6px 12px 6px 8px;cursor:pointer;user-select:none;
+  color:var(--ink); transition:opacity .15s;
+}
+.legend-chip .sw{width:11px;height:11px;border-radius:50%;flex:none;}
+.legend-chip.off{opacity:0.35;}
+.mastermap-box{border-radius:16px;overflow:hidden;border:1px solid var(--line);height:420px;box-shadow:0 8px 24px rgba(15,53,89,0.08);}
+.mastermap-box #masterMap{width:100%;height:100%;}
+.map-hint{font-size:11.5px;color:#8b8a80;margin-top:8px;}
+.map-focus-btn{
+  display:inline-flex;align-items:center;gap:6px;font-size:12px;border:1px solid var(--navy);
+  color:var(--navy);background:#fff;border-radius:20px;padding:6px 13px;cursor:pointer;font-family:inherit;
+  margin-top:2px;
+}
+.map-focus-btn:active{background:var(--navy);color:#fff;}
+
 @media(min-width:680px){
   .hero h1{font-size:36px;}
   .day-body{grid-template-columns:1.1fr 0.9fr;}
   .cmp-grid{grid-template-columns:repeat(3,1fr);}
   .tr-grid{grid-template-columns:repeat(2,1fr);}
   .check-grid{grid-template-columns:repeat(2,1fr);}
+  .mastermap-box{height:520px;}
 }
 </style>
+<script>
+  (function(){
+    var s = document.createElement('script');
+    s.src = "https://maps.googleapis.com/maps/api/js?key=AIzaSyAZislK5mCjFvQ_W6_2zbwgrHprBWXUW-U&callback=initMasterMap&loading=async&v=weekly";
+    s.async = true;
+    document.head.appendChild(s);
+  })();
+</script>
 </head>
 <body>
 
@@ -171,7 +219,7 @@ footer{padding:26px 20px 40px;text-align:center;font-size:11.5px;color:#8b8a80;}
   <div class="topbar-inner">
     <div class="brand">CROATIA · 7박8일</div>
     <nav class="topnav">
-      <a href="#route">전체 동선</a>
+      <a href="#map">전체 동선(지도)</a>
       <a href="#days">일자별 일정</a>
       <a href="#stay">숙소·맛집</a>
       <a href="#transport">교통</a>
@@ -183,9 +231,10 @@ footer{padding:26px 20px 40px;text-align:center;font-size:11.5px;color:#8b8a80;}
 
 <div class="hero">
   <div class="wrap">
-    <p class="eyebrow">유앤김패밀리 · 은퇴부부 자유여행 통합본</p>
-    <h1>크로아티아 7박8일<br>자그레브 → 플리트비체 → 자다르 → 스플리트 → 두브로브니크</h1>
-    <p class="lead">자그레브 IN · 두브로브니크 OUT(오픈조 항공)으로 역주행 없이 남하하는 7박8일 최종 일정입니다. 날짜마다 지도·장소·주소를 바로 내비게이션 앱에 붙여넣을 수 있게 정리했습니다.</p>
+    <p class="eyebrow">유앤김패밀리 · 은퇴부부 자유여행</p>
+    <h1>크로아티아<br>7박 8일</h1>
+    <p class="lead">자그레브 IN · 두브로브니크 OUT — 아드리아 해안을 따라 남하하는 7박8일. 도시마다 지도·주소를 내비게이션 앱에 바로 붙여넣을 수 있게 정리했습니다.</p>
+    <span class="update-badge" id="updateBadge"><span class="dot"></span>최종 업데이트 · <span id="updateTime"></span></span>
     <div class="hero-meta">
       <span>자그레브 1박</span>
       <span>플리트비체 1박</span>
@@ -194,50 +243,37 @@ footer{padding:26px 20px 40px;text-align:center;font-size:11.5px;color:#8b8a80;}
       <span>두브로브니크 2박</span>
       <span>부부 2인 · 도어투도어 전용차량 기준</span>
     </div>
-    <div class="route-svg-box">
-      <svg viewBox="0 0 720 260" xmlns="http://www.w3.org/2000/svg" width="100%" height="auto" role="img" aria-label="크로아티아 동선 지도">
-        <defs>
-          <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-            <path d="M0,0 L10,5 L0,10 z" fill="#C99A3E"/>
-          </marker>
-        </defs>
-        <!-- coastline hint -->
-        <path d="M120,20 Q90,80 130,140 Q160,190 140,240" fill="none" stroke="#2C557F" stroke-width="1" opacity="0.35"/>
-        <!-- route path -->
-        <path d="M120,40 L200,60 L210,110 Q230,150 220,200" fill="none" stroke="#C99A3E" stroke-width="2.5" stroke-dasharray="1 8" stroke-linecap="round" marker-end="url(#arrow)"/>
-        <!-- stops -->
-        <g font-family="Noto Sans KR, sans-serif">
-          <circle cx="120" cy="40" r="7" fill="#BC5B39"/>
-          <text x="134" y="36" font-size="13" fill="#0F3559" font-weight="700">① 자그레브</text>
-          <text x="134" y="52" font-size="10.5" fill="#5B6B4F">1박 · 시내 도보</text>
-
-          <circle cx="150" cy="78" r="5.5" fill="#5B6B4F"/>
-          <text x="162" y="82" font-size="11" fill="#5B6B4F">라스토케(경유)</text>
-
-          <circle cx="200" cy="60" r="7" fill="#BC5B39"/>
-          <text x="214" y="56" font-size="13" fill="#0F3559" font-weight="700">② 플리트비체</text>
-          <text x="214" y="72" font-size="10.5" fill="#5B6B4F">1박 · 국립공원</text>
-
-          <circle cx="210" cy="110" r="7" fill="#BC5B39"/>
-          <text x="224" y="106" font-size="13" fill="#0F3559" font-weight="700">③ 자다르</text>
-          <text x="224" y="122" font-size="10.5" fill="#5B6B4F">1박 · 바다오르간</text>
-
-          <circle cx="220" cy="160" r="7" fill="#BC5B39"/>
-          <text x="234" y="156" font-size="13" fill="#0F3559" font-weight="700">④ 스플리트</text>
-          <text x="234" y="172" font-size="10.5" fill="#5B6B4F">2박 · 궁전 구시가</text>
-
-          <circle cx="205" cy="205" r="5.5" fill="#5B6B4F"/>
-          <text x="217" y="209" font-size="11" fill="#5B6B4F">말리 스톤(경유·굴요리)</text>
-
-          <circle cx="220" cy="230" r="7" fill="#BC5B39"/>
-          <text x="234" y="226" font-size="13" fill="#0F3559" font-weight="700">⑤ 두브로브니크</text>
-          <text x="234" y="242" font-size="10.5" fill="#5B6B4F">2박 · 성벽·스르지산</text>
-        </g>
-      </svg>
-      <p class="cap">전용차량(도어투도어) 기준 남하 동선 — 항공은 자그레브 IN / 두브로브니크 OUT</p>
+    <div class="day-pillnav" aria-label="일자 바로가기">
+      <a class="day-pill" href="#map" onclick="focusDay(1);return false;">1</a>
+      <a class="day-pill" href="#map" onclick="focusDay(2);return false;">2</a>
+      <a class="day-pill" href="#map" onclick="focusDay(3);return false;">3</a>
+      <a class="day-pill" href="#map" onclick="focusDay(4);return false;">4</a>
+      <a class="day-pill" href="#map" onclick="focusDay(5);return false;">5</a>
+      <a class="day-pill" href="#map" onclick="focusDay(6);return false;">6</a>
+      <a class="day-pill" href="#map" onclick="focusDay(7);return false;">7</a>
+      <a class="day-pill" href="#map" onclick="focusDay(8);return false;">8</a>
     </div>
   </div>
 </div>
+
+<section id="map" class="alt">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="kicker">MAP — 전체 동선</p>
+      <h2>구글 지도로 보는 전체 동선</h2>
+      <p>손가락으로 확대·축소·좌우 이동이 가능합니다. 칩을 눌러 숙소·맛집·관광스팟·공항·대중교통을 원하는 대로 켜고 끌 수 있고, 위 숫자 버튼(1~8)을 누르면 해당 일자 구간으로 지도가 바로 이동합니다.</p>
+    </div>
+    <div class="legend-row" id="legendRow">
+      <span class="legend-chip" data-type="hotel"><span class="sw" style="background:#0F3559"></span>숙소</span>
+      <span class="legend-chip" data-type="food"><span class="sw" style="background:#BC5B39"></span>맛집</span>
+      <span class="legend-chip" data-type="spot"><span class="sw" style="background:#5B6B4F"></span>관광스팟</span>
+      <span class="legend-chip" data-type="airport"><span class="sw" style="background:#C99A3E"></span>공항</span>
+      <span class="legend-chip" data-type="transit"><span class="sw" style="background:#7A7A72"></span>대중교통·경유지</span>
+    </div>
+    <div class="mastermap-box"><div id="masterMap"></div></div>
+    <p class="map-hint">지도 로딩에 잠시 시간이 걸릴 수 있습니다. 마커를 누르면 이름·주소·설명이 표시됩니다.</p>
+  </div>
+</section>
 
 <section id="route">
   <div class="wrap">
@@ -285,7 +321,7 @@ footer{padding:26px 20px 40px;text-align:center;font-size:11.5px;color:#8b8a80;}
           </ul>
         </div>
         <div>
-          <div class="mapbox"><iframe loading="lazy" src="https://www.openstreetmap.org/export/embed.html?bbox=15.9519%2C45.7950%2C16.0119%2C45.8350&layer=mapnik&marker=45.8150%2C15.9819"></iframe></div>
+          <button class="map-focus-btn" onclick="focusDay(1)">🗺️ 이 날 동선 지도에서 보기</button>
         </div>
       </div>
       <div class="stay-box"><span class="label">숙박</span>에스플라나드 자그레브 호텔 (자그레브역 인근, 1925년 개관 5성급)</div>
@@ -305,7 +341,7 @@ footer{padding:26px 20px 40px;text-align:center;font-size:11.5px;color:#8b8a80;}
           </ul>
         </div>
         <div>
-          <div class="mapbox"><iframe loading="lazy" src="https://www.openstreetmap.org/export/embed.html?bbox=15.9619%2C45.8050%2C16.0019%2C45.8280&layer=mapnik&marker=45.8135%2C15.9773"></iframe></div>
+          <button class="map-focus-btn" onclick="focusDay(2)">🗺️ 이 날 동선 지도에서 보기</button>
         </div>
       </div>
       <div class="stay-box"><span class="label">숙박</span>에스플라나드 자그레브 호텔 (2박째)</div>
@@ -325,7 +361,7 @@ footer{padding:26px 20px 40px;text-align:center;font-size:11.5px;color:#8b8a80;}
           </ul>
         </div>
         <div>
-          <div class="mapbox"><iframe loading="lazy" src="https://www.openstreetmap.org/export/embed.html?bbox=15.5150%2C44.8350%2C15.6850%2C44.9000&layer=mapnik&marker=44.8654%2C15.6001"></iframe></div>
+          <button class="map-focus-btn" onclick="focusDay(3)">🗺️ 이 날 동선 지도에서 보기</button>
         </div>
       </div>
       <div class="stay-box"><span class="label">숙박</span>호텔 예제로(Hotel Jezero) — 국립공원 입구2 도보권</div>
@@ -345,7 +381,7 @@ footer{padding:26px 20px 40px;text-align:center;font-size:11.5px;color:#8b8a80;}
           </ul>
         </div>
         <div>
-          <div class="mapbox"><iframe loading="lazy" src="https://www.openstreetmap.org/export/embed.html?bbox=15.1900%2C44.0994%2C15.2700%2C44.1394&layer=mapnik&marker=44.1194%2C15.2314"></iframe></div>
+          <button class="map-focus-btn" onclick="focusDay(4)">🗺️ 이 날 동선 지도에서 보기</button>
         </div>
       </div>
       <div class="stay-box"><span class="label">숙박</span>A'mare Hotel Zadar — 구시가 도보 5~10분</div>
@@ -365,7 +401,7 @@ footer{padding:26px 20px 40px;text-align:center;font-size:11.5px;color:#8b8a80;}
           </ul>
         </div>
         <div>
-          <div class="mapbox"><iframe loading="lazy" src="https://www.openstreetmap.org/export/embed.html?bbox=16.4102%2C43.4881%2C16.4702%2C43.5281&layer=mapnik&marker=43.5081%2C16.4402"></iframe></div>
+          <button class="map-focus-btn" onclick="focusDay(5)">🗺️ 이 날 동선 지도에서 보기</button>
         </div>
       </div>
       <div class="stay-box"><span class="label">숙박</span>코르나로 호텔(Cornaro Hotel) — 궁전 도보 3~5분 (1/2박)</div>
@@ -384,7 +420,7 @@ footer{padding:26px 20px 40px;text-align:center;font-size:11.5px;color:#8b8a80;}
           </ul>
         </div>
         <div>
-          <div class="mapbox"><iframe loading="lazy" src="https://www.openstreetmap.org/export/embed.html?bbox=16.4102%2C43.4881%2C16.4702%2C43.5281&layer=mapnik&marker=43.5081%2C16.4402"></iframe></div>
+          <button class="map-focus-btn" onclick="focusDay(6)">🗺️ 이 날 동선 지도에서 보기</button>
         </div>
       </div>
       <div class="stay-box"><span class="label">숙박</span>코르나로 호텔(Cornaro Hotel) (2/2박)</div>
@@ -404,7 +440,7 @@ footer{padding:26px 20px 40px;text-align:center;font-size:11.5px;color:#8b8a80;}
           </ul>
         </div>
         <div>
-          <div class="mapbox"><iframe loading="lazy" src="https://www.openstreetmap.org/export/embed.html?bbox=18.0644%2C42.6207%2C18.1244%2C42.6807&layer=mapnik&marker=42.6507%2C18.0944"></iframe></div>
+          <button class="map-focus-btn" onclick="focusDay(7)">🗺️ 이 날 동선 지도에서 보기</button>
         </div>
       </div>
       <div class="stay-box"><span class="label">숙박</span>힐튼 임페리얼 두브로브니크 — 필레 게이트 도보 1~2분 (1/2박)</div>
@@ -424,7 +460,7 @@ footer{padding:26px 20px 40px;text-align:center;font-size:11.5px;color:#8b8a80;}
           </ul>
         </div>
         <div>
-          <div class="mapbox"><iframe loading="lazy" src="https://www.openstreetmap.org/export/embed.html?bbox=18.0644%2C42.6207%2C18.1244%2C42.6807&layer=mapnik&marker=42.6507%2C18.0944"></iframe></div>
+          <button class="map-focus-btn" onclick="focusDay(8)">🗺️ 이 날 동선 지도에서 보기</button>
         </div>
       </div>
       <div class="stay-box"><span class="label">숙박</span>힐튼 임페리얼 두브로브니크 (2/2박) · 다음날 자유일 후 출국</div>
@@ -575,22 +611,41 @@ footer{padding:26px 20px 40px;text-align:center;font-size:11.5px;color:#8b8a80;}
 </footer>
 
 <script>
+document.getElementById('updateTime').textContent = window.GMAPS_LAST_UPDATED || '';
+
+// cat: hotel | food | spot | airport | transit  (색상 구분에 사용)
 const STAYS = [
-  {city:"자그레브", name:"에스플라나드 자그레브 호텔", type:"숙소", addr:"Mihanovićeva 1, 10000 Zagreb, Croatia"},
-  {city:"자그레브", name:"La Štruk", type:"맛집", addr:"Skalinska ul. 5, 10000 Zagreb, Croatia"},
-  {city:"자그레브", name:"Restoran Boban", type:"맛집", addr:"Gajeva ul. 9, 10000 Zagreb, Croatia"},
-  {city:"플리트비체", name:"호텔 예제로 (Hotel Jezero)", type:"숙소", addr:"Josipa Jovića 2, 53231 Plitvička Jezera, Croatia"},
-  {city:"자다르", name:"A'mare Hotel Zadar", type:"숙소", addr:"Bana Josipa Jelačića 4a, 23000 Zadar, Croatia"},
-  {city:"자다르", name:"Restaurant Bruschetta", type:"맛집", addr:"Zadar Old Town, 23000 Zadar, Croatia"},
-  {city:"스플리트", name:"코르나로 호텔 (Cornaro Hotel)", type:"숙소", addr:"Sinjska ulica 6, 21000 Split, Croatia"},
-  {city:"스플리트", name:"Konoba Matejuska", type:"맛집", addr:"Tomića Stine 3, 21000 Split, Croatia"},
-  {city:"스플리트", name:"Bokeria Kitchen & Wine", type:"맛집", addr:"Domaldova ul. 8, 21000 Split, Croatia"},
-  {city:"두브로브니크", name:"힐튼 임페리얼 두브로브니크", type:"숙소", addr:"Marijana Blažića 2, 20000 Dubrovnik, Croatia"},
-  {city:"두브로브니크", name:"Hotel Lero (대안 숙소)", type:"숙소", addr:"Iva Vojnovića 14, 20000 Dubrovnik, Croatia"},
-  {city:"두브로브니크", name:"Restaurant Panorama", type:"맛집", addr:"Srđ, Žarkova poljana 4, 20000 Dubrovnik, Croatia"},
-  {city:"두브로브니크", name:"두브로브니크 공항 (DBV)", type:"공항", addr:"Dubrovnik Airport, Ćilipi, 20213 Dubrovnik, Croatia"},
-  {city:"자그레브", name:"자그레브 공항 (ZAG)", type:"공항", addr:"Zagreb Airport, Rudolfa Fizira 1, 10150 Zagreb, Croatia"},
+  {city:"자그레브", name:"에스플라나드 자그레브 호텔", type:"숙소", cat:"hotel", day:1, addr:"Mihanovićeva 1, 10000 Zagreb, Croatia", lat:45.8081, lng:15.9793, desc:"1925년 개관 5성급, 자그레브역 인근"},
+  {city:"자그레브", name:"La Štruk", type:"맛집", cat:"food", day:2, addr:"Skalinska ul. 5, 10000 Zagreb, Croatia", lat:45.8114, lng:15.9739, desc:"전통 치즈페이스트리 슈트루클리 전문점"},
+  {city:"자그레브", name:"Restoran Boban", type:"맛집", cat:"food", day:2, addr:"Gajeva ul. 9, 10000 Zagreb, Croatia", lat:45.8113, lng:15.9765, desc:"스테이크·파스타, 미슐랭 가이드 언급"},
+  {city:"자그레브", name:"반 옐라치치 광장", type:"관광스팟", cat:"spot", day:2, addr:"Trg bana Josipa Jelačića, 10000 Zagreb, Croatia", lat:45.8131, lng:15.9780, desc:"자그레브 중심 광장"},
+  {city:"자그레브", name:"돌라츠 시장", type:"관광스팟", cat:"spot", day:2, addr:"Dolac 9, 10000 Zagreb, Croatia", lat:45.8140, lng:15.9787, desc:"오전 방문 추천, 현지 농산물 시장"},
+  {city:"자그레브", name:"성 마르코 성당", type:"관광스팟", cat:"spot", day:2, addr:"Trg Svetog Marka 5, 10000 Zagreb, Croatia", lat:45.8127, lng:15.9755, desc:"모자이크 지붕이 상징인 성당"},
+  {city:"자그레브", name:"자그레브 공항 (ZAG)", type:"공항", cat:"airport", day:1, addr:"Zračna luka Zagreb, Rudolfa Fizira 1, 10150 Zagreb, Croatia", lat:45.7429, lng:16.0688, desc:"인천 경유편 도착 공항"},
+  {city:"라스토케", name:"라스토케 폭포마을(경유)", type:"경유지", cat:"transit", day:3, addr:"Rastoke, 47240 Slunj, Croatia", lat:45.1101, lng:15.5761, desc:"송어구이 점심, 약 2시간 체류"},
+  {city:"플리트비체", name:"호텔 예제로 (Hotel Jezero)", type:"숙소", cat:"hotel", day:3, addr:"Josipa Jovića 2, 53231 Plitvička Jezera, Croatia", lat:44.8809, lng:15.5972, desc:"국립공원 입구2 도보권"},
+  {city:"플리트비체", name:"플리트비체 하부호수", type:"관광스팟", cat:"spot", day:4, addr:"Plitvička jezera, 53231 Plitvička Jezera, Croatia", lat:44.8654, lng:15.6001, desc:"하부호수+전기보트 코스"},
+  {city:"자다르", name:"A'mare Hotel Zadar", type:"숙소", cat:"hotel", day:4, addr:"Bana Josipa Jelačića 4a, 23000 Zadar, Croatia", lat:44.1175, lng:15.2280, desc:"구시가 도보 5~10분"},
+  {city:"자다르", name:"Restaurant Bruschetta", type:"맛집", cat:"food", day:4, addr:"Zadar Old Town, 23000 Zadar, Croatia", lat:44.1140, lng:15.2280, desc:"구시가 해산물 레스토랑"},
+  {city:"자다르", name:"바다 오르간 · 태양의 인사", type:"관광스팟", cat:"spot", day:4, addr:"Zadar Sea Organ, Obala kralja Petra Krešimira IV, 23000 Zadar, Croatia", lat:44.1151, lng:15.2214, desc:"일몰 무렵 방문이 하이라이트"},
+  {city:"자다르", name:"자다르 버스터미널(경유)", type:"대중교통", cat:"transit", day:5, addr:"Autobusni kolodvor Zadar, Ante Starčevića 4, 23000 Zadar, Croatia", lat:44.1129, lng:15.2321, desc:"스플리트행 버스 이용 시"},
+  {city:"스플리트", name:"코르나로 호텔 (Cornaro Hotel)", type:"숙소", cat:"hotel", day:5, addr:"Sinjska ulica 6, 21000 Split, Croatia", lat:43.5083, lng:16.4373, desc:"디오클레티아누스 궁전 도보 3~5분"},
+  {city:"스플리트", name:"디오클레티아누스 궁전", type:"관광스팟", cat:"spot", day:5, addr:"Dioklecijanova palača, 21000 Split, Croatia", lat:43.5083, lng:16.4402, desc:"페리스타일·대성당·지하홀"},
+  {city:"스플리트", name:"리바 해변산책로", type:"관광스팟", cat:"spot", day:6, addr:"Obala Hrvatskog narodnog preporoda, 21000 Split, Croatia", lat:43.5069, lng:16.4390, desc:"노천카페가 늘어선 해변 산책로"},
+  {city:"스플리트", name:"Konoba Matejuska", type:"맛집", cat:"food", day:6, addr:"Tomića Stine 3, 21000 Split, Croatia", lat:43.5057, lng:16.4368, desc:"현지인이 인정하는 해산물 전문점"},
+  {city:"스플리트", name:"Bokeria Kitchen & Wine", type:"맛집", cat:"food", day:5, addr:"Domaldova ul. 8, 21000 Split, Croatia", lat:43.5088, lng:16.4407, desc:"지중해 파인다이닝 & 와인"},
+  {city:"스플리트", name:"스플리트 페리·버스터미널(경유)", type:"대중교통", cat:"transit", day:7, addr:"Obala Kneza Domagoja 12, 21000 Split, Croatia", lat:43.5057, lng:16.4423, desc:"두브로브니크행 이동 시 경유"},
+  {city:"말리 스톤", name:"말리 스톤(경유·굴요리)", type:"경유지", cat:"transit", day:7, addr:"Mali Ston, 20230 Ston, Croatia", lat:42.8503, lng:17.6981, desc:"석화·홍합 요리 점심"},
+  {city:"두브로브니크", name:"힐튼 임페리얼 두브로브니크", type:"숙소", cat:"hotel", day:7, addr:"Marijana Blažića 2, 20000 Dubrovnik, Croatia", lat:42.6420, lng:18.1067, desc:"필레 게이트 도보 1~2분"},
+  {city:"두브로브니크", name:"Hotel Lero (대안 숙소)", type:"숙소", cat:"hotel", day:7, addr:"Iva Vojnovića 14, 20000 Dubrovnik, Croatia", lat:42.6396, lng:18.0993, desc:"구시가 인근 대안 숙소"},
+  {city:"두브로브니크", name:"두브로브니크 성벽·스트라둔", type:"관광스팟", cat:"spot", day:8, addr:"City Walls, Dubrovnik, Croatia", lat:42.6414, lng:18.1096, desc:"동계 09:00~15:00 운영, 오전 방문 필수"},
+  {city:"두브로브니크", name:"스르지산 케이블카", type:"관광스팟", cat:"spot", day:8, addr:"Dubrovnik Cable Car, Frana Supila, 20000 Dubrovnik, Croatia", lat:42.6434, lng:18.1088, desc:"일몰 전망대로 이동"},
+  {city:"두브로브니크", name:"Restaurant Panorama", type:"맛집", cat:"food", day:8, addr:"Srđ, Žarkova poljana 4, 20000 Dubrovnik, Croatia", lat:42.6520, lng:18.1104, desc:"아드리아해 일몰 전망 만찬, 사전예약 필수"},
+  {city:"두브로브니크", name:"두브로브니크 공항 (DBV)", type:"공항", cat:"airport", day:8, addr:"Zračna luka Dubrovnik, Ćilipi, 20213 Dubrovnik, Croatia", lat:42.5614, lng:18.2682, desc:"귀국편 출발 공항"},
 ];
+
+const CAT_COLOR = {hotel:"#0F3559", food:"#BC5B39", spot:"#5B6B4F", airport:"#C99A3E", transit:"#7A7A72"};
+const CAT_LABEL = {hotel:"숙소", food:"맛집", spot:"관광스팟", airport:"공항", transit:"대중교통·경유지"};
 
 function mapUrl(addr){ return "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(addr); }
 
@@ -599,7 +654,7 @@ function fillStayTable(){
   body.innerHTML = STAYS.map((s,i) => `
     <tr>
       <td><span class="city-badge">${s.city}</span></td>
-      <td>${s.name}<br><span style="font-size:11px;color:#8a8a80;">${s.type}</span></td>
+      <td>${s.name}<br><span style="font-size:11px;color:#8a8a80;">${s.type} · D${s.day}</span></td>
       <td>${s.type}</td>
       <td>${s.addr}</td>
       <td class="copyc">
@@ -609,6 +664,79 @@ function fillStayTable(){
     </tr>`).join('');
 }
 fillStayTable();
+
+/* ===== Google 지도 (전체 동선) ===== */
+let gMap = null;
+let gMarkers = [];
+const activeCats = new Set(Object.keys(CAT_COLOR));
+
+function initMasterMap(){
+  gMap = new google.maps.Map(document.getElementById('masterMap'), {
+    zoom: 8,
+    center: {lat:44.3, lng:16.5},
+    mapId: "DEMO_MAP_ID",
+    gestureHandling: "greedy",
+    streetViewControl: false,
+    fullscreenControl: true,
+    mapTypeControl: false
+  });
+
+  const bounds = new google.maps.LatLngBounds();
+  gMarkers = STAYS.map(s => {
+    const marker = new google.maps.Marker({
+      position: {lat:s.lat, lng:s.lng},
+      map: gMap,
+      title: s.name,
+      icon: {
+        path: google.maps.SymbolPath.CIRCLE,
+        fillColor: CAT_COLOR[s.cat],
+        fillOpacity: 1,
+        strokeColor: "#fff",
+        strokeWeight: 2,
+        scale: 9
+      },
+      label: { text: String(s.day), color:"#fff", fontSize:"10px", fontWeight:"700" }
+    });
+    const info = new google.maps.InfoWindow({
+      content: `<div style="font-family:'Noto Sans KR',sans-serif;max-width:220px;">
+        <div style="font-size:10.5px;color:${CAT_COLOR[s.cat]};font-weight:700;margin-bottom:2px;">D${s.day} · ${CAT_LABEL[s.cat]}</div>
+        <div style="font-size:13.5px;font-weight:700;margin-bottom:3px;">${s.name}</div>
+        <div style="font-size:11.5px;color:#555;margin-bottom:4px;">${s.desc||''}</div>
+        <div style="font-size:11px;color:#888;">${s.addr}</div>
+      </div>`
+    });
+    marker.addListener('click', () => info.open(gMap, marker));
+    marker._cat = s.cat; marker._day = s.day; marker._info = info;
+    bounds.extend(marker.getPosition());
+    return marker;
+  });
+  gMap.fitBounds(bounds, 40);
+}
+
+function applyLegendFilter(){
+  gMarkers.forEach(m => m.setMap(activeCats.has(m._cat) ? gMap : null));
+}
+
+document.getElementById('legendRow').addEventListener('click', (e) => {
+  const chip = e.target.closest('.legend-chip');
+  if(!chip) return;
+  const t = chip.getAttribute('data-type');
+  if(activeCats.has(t)){ activeCats.delete(t); chip.classList.add('off'); }
+  else { activeCats.add(t); chip.classList.remove('off'); }
+  applyLegendFilter();
+});
+
+function focusDay(n){
+  document.getElementById('map').scrollIntoView({behavior:'smooth', block:'start'});
+  if(!gMap || !gMarkers.length) return;
+  const dayMarkers = gMarkers.filter(m => m._day === n);
+  if(!dayMarkers.length) return;
+  const bounds = new google.maps.LatLngBounds();
+  dayMarkers.forEach(m => bounds.extend(m.getPosition()));
+  gMap.fitBounds(bounds, 60);
+  if(gMap.getZoom() > 14) gMap.setZoom(14);
+  setTimeout(() => dayMarkers[0]._info.open(gMap, dayMarkers[0]), 400);
+}
 
 // generic copy handler for both master table and inline addr-rows
 function copyAddr(btn){
