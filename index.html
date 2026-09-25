@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>크로아티아 7박8일 — 통합 여행 노트</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@500;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0F3559; --navy-2:#123d66; --terracotta:#BC5B39; --stone:#F1E9DA;
+  --stone-2:#E7DBC4; --ink:#20242B; --olive:#5B6B4F; --gold:#C99A3E;
+  --line:#D8CBAA; --white:#FFFCF6;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+:root:not([data-theme="light"]){ }
+*{box-sizing:border-box;}
+html,body{margin:0;height:100%;}
+html{scroll-padding-top:56px;}
+body{
+  background:var(--stone); color:var(--ink);
+  font-family:"Noto Sans KR",sans-serif; line-height:1.65;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+h1,h2,h3,.disp{font-family:"Noto Serif KR",serif;}
+img{max-width:100%;}
+a{color:inherit;}
+.wrap{max-width:880px;margin:0 auto;padding:0 20px;}
+
+/* ===== top nav ===== */
+.topbar{
+  position:sticky; top:0; z-index:50; background:rgba(15,53,89,0.96);
+  padding-top:env(safe-area-inset-top,0px); backdrop-filter:blur(6px);
+  border-bottom:1px solid rgba(201,154,62,0.4);
+}
+.topbar-inner{max-width:880px;margin:0 auto;display:flex;align-items:center;gap:14px;padding:10px 20px;overflow-x:auto;}
+.topbar-inner::-webkit-scrollbar{display:none;}
+.brand{color:var(--stone);font-family:"Noto Serif KR",serif;font-size:15px;font-weight:700;white-space:nowrap;flex:none;}
+.topnav{display:flex;gap:4px;}
+.topnav a{white-space:nowrap;color:#D9C9A3;font-size:12.5px;text-decoration:none;padding:6px 10px;border-radius:20px;border:1px solid rgba(217,201,163,0.35);}
+.topnav a:active{background:rgba(201,154,62,0.25);}
+
+/* ===== hero ===== */
+.hero{
+  background:linear-gradient(180deg,var(--navy) 0%, var(--navy-2) 60%, #0c2a49 100%);
+  color:var(--stone); padding:38px 20px 30px;
+}
+.hero .eyebrow{color:var(--gold); font-size:13px; letter-spacing:0.02em; margin:0 0 10px;}
+.hero h1{font-size:30px;line-height:1.32;margin:0 0 12px;color:#fff;}
+.hero p.lead{font-size:14.5px;color:#CFDDEB;max-width:60ch;margin:0 0 20px;}
+.hero-meta{display:flex;flex-wrap:wrap;gap:10px;}
+.hero-meta span{
+  font-size:12.5px;background:rgba(255,255,255,0.08);border:1px solid rgba(201,154,62,0.5);
+  color:#F1E9DA; padding:6px 12px;border-radius:20px;
+}
+.route-svg-box{margin-top:26px;background:rgba(255,255,255,0.04);border:1px solid rgba(201,154,62,0.35);border-radius:14px;padding:10px 6px 4px;}
+.route-svg-box .cap{font-size:11.5px;color:#B9C7D6;text-align:center;margin:6px 0 2px;}
+
+/* ===== sections ===== */
+section{padding:34px 20px;}
+section.alt{background:var(--white);}
+.section-head{margin-bottom:18px;}
+.section-head .kicker{font-size:12px;color:var(--terracotta);font-weight:700;letter-spacing:0.02em;margin:0 0 4px;}
+.section-head h2{font-size:21px;margin:0 0 6px;color:var(--navy);}
+.section-head p{font-size:13.5px;color:#57544A;margin:0;max-width:64ch;}
+
+/* ===== compare cards (3 sources) ===== */
+.cmp-grid{display:grid;grid-template-columns:1fr;gap:12px;}
+.cmp-card{background:var(--white);border:1px solid var(--line);border-radius:12px;padding:16px 18px;}
+.cmp-card .tag{display:inline-block;font-size:11px;background:var(--navy);color:#fff;padding:3px 9px;border-radius:20px;margin-bottom:8px;}
+.cmp-card h3{font-size:15px;margin:0 0 6px;color:var(--ink);}
+.cmp-card ul{margin:0;padding-left:18px;font-size:13px;color:#4B4A43;}
+.cmp-card li{margin-bottom:4px;}
+.verdict{margin-top:14px;background:#FBF3E3;border:1px dashed var(--gold);border-radius:12px;padding:14px 16px;font-size:13.5px;color:#4B4A43;}
+.verdict b{color:var(--terracotta);}
+
+/* ===== itinerary overview table ===== */
+.ov-table{width:100%;border-collapse:collapse;font-size:12.8px;background:var(--white);border:1px solid var(--line);border-radius:10px;overflow:hidden;}
+.ov-table th,.ov-table td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top;}
+.ov-table th{background:var(--navy);color:#fff;font-weight:500;font-size:11.8px;}
+.ov-table tr:last-child td{border-bottom:none;}
+.ov-table .d{font-family:"Noto Serif KR",serif;font-weight:700;color:var(--terracotta);}
+.scrollx{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+
+/* ===== day cards ===== */
+.day{
+  background:var(--white); border:1px solid var(--line); border-radius:16px; padding:20px;
+  margin-bottom:16px; position:relative; scroll-margin-top:64px;
+}
+.day-num{
+  display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;
+  background:var(--terracotta);color:#fff;font-family:"Noto Serif KR",serif;font-weight:700;font-size:14px;flex:none;
+}
+.day-head{display:flex;align-items:center;gap:12px;margin-bottom:4px;}
+.day-head h3{font-size:16.5px;margin:0;color:var(--navy);}
+.day-sub{font-size:12px;color:var(--olive);margin:2px 0 14px 46px;}
+.day-body{display:grid;grid-template-columns:1fr;gap:14px;}
+.timeline{list-style:none;margin:0;padding:0;}
+.timeline li{
+  display:grid;grid-template-columns:52px 1fr;gap:10px;padding:8px 0;border-top:1px dotted var(--line);
+  font-size:13px;
+}
+.timeline li:first-child{border-top:none;}
+.timeline time{color:var(--terracotta);font-weight:700;font-size:12px;padding-top:1px;}
+.timeline .note{color:#6b6a61;font-size:12px;display:block;margin-top:2px;}
+.stay-box{
+  background:var(--stone);border:1px solid var(--line);border-radius:10px;padding:12px 14px;font-size:12.8px;
+}
+.stay-box .label{font-size:11px;color:var(--olive);font-weight:700;margin-bottom:2px;}
+.mapbox{border-radius:10px;overflow:hidden;border:1px solid var(--line);height:190px;}
+.mapbox iframe{width:100%;height:100%;border:0;display:block;filter:saturate(0.9);}
+.addr-list{display:flex;flex-direction:column;gap:8px;}
+.addr-row{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--stone);
+  border:1px solid var(--line);border-radius:10px;padding:9px 12px;
+}
+.addr-row .a-name{font-size:12.8px;font-weight:700;color:var(--ink);}
+.addr-row .a-addr{font-size:11.8px;color:#67665c;margin-top:1px;}
+.addr-actions{display:flex;gap:6px;flex:none;}
+.btn-mini{
+  font-size:11px;border:1px solid var(--navy);color:var(--navy);background:#fff;border-radius:8px;
+  padding:6px 8px;cursor:pointer;white-space:nowrap;text-decoration:none;font-family:inherit;
+}
+.btn-mini.copied{background:var(--olive);border-color:var(--olive);color:#fff;}
+.btn-mini.map{background:var(--navy);color:#fff;border-color:var(--navy);}
+
+/* ===== hotel/restaurant master table ===== */
+.master-table{width:100%;border-collapse:collapse;font-size:12.5px;}
+.master-table th,.master-table td{padding:10px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top;}
+.master-table th{background:var(--navy);color:#fff;font-size:11.5px;font-weight:500;}
+.master-table td.copyc{white-space:nowrap;}
+.city-badge{display:inline-block;font-size:10.5px;background:var(--stone-2);color:var(--navy);border-radius:6px;padding:2px 7px;font-weight:700;}
+
+/* ===== transport cards ===== */
+.tr-grid{display:grid;grid-template-columns:1fr;gap:12px;}
+.tr-card{background:var(--white);border:1px solid var(--line);border-radius:12px;padding:16px 18px;}
+.tr-card h4{margin:0 0 6px;font-size:14.5px;color:var(--terracotta);}
+.tr-card p{margin:0 0 6px;font-size:13px;color:#4B4A43;}
+.tr-card .app-links{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;}
+.applink{font-size:11.5px;border:1px solid var(--line);background:var(--stone);border-radius:20px;padding:5px 10px;text-decoration:none;color:var(--ink);}
+
+/* ===== budget table ===== */
+.budget-table{width:100%;border-collapse:collapse;font-size:13px;}
+.budget-table th,.budget-table td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:left;}
+.budget-table th{background:var(--navy);color:#fff;font-weight:500;font-size:12px;}
+.budget-table td.num{text-align:right;font-variant-numeric:tabular-nums;}
+.budget-table tr.total td{font-weight:700;color:var(--terracotta);border-top:2px solid var(--navy);border-bottom:none;}
+
+/* checklist */
+.check-grid{display:grid;grid-template-columns:1fr;gap:10px;}
+.check-card{background:var(--white);border:1px solid var(--line);border-radius:12px;padding:14px 16px;}
+.check-card h4{margin:0 0 8px;font-size:13.5px;color:var(--navy);}
+.check-card ul{margin:0;padding-left:18px;font-size:12.8px;color:#4B4A43;}
+.check-card li{margin-bottom:5px;}
+
+footer{padding:26px 20px 40px;text-align:center;font-size:11.5px;color:#8b8a80;}
+
+@media(min-width:680px){
+  .hero h1{font-size:36px;}
+  .day-body{grid-template-columns:1.1fr 0.9fr;}
+  .cmp-grid{grid-template-columns:repeat(3,1fr);}
+  .tr-grid{grid-template-columns:repeat(2,1fr);}
+  .check-grid{grid-template-columns:repeat(2,1fr);}
+}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">CROATIA · 7박8일</div>
+    <nav class="topnav">
+      <a href="#compare">3개 자료 비교</a>
+      <a href="#route">전체 동선</a>
+      <a href="#days">일자별 일정</a>
+      <a href="#stay">숙소·맛집</a>
+      <a href="#transport">교통</a>
+      <a href="#budget">예산</a>
+      <a href="#prep">준비물</a>
+    </nav>
+  </div>
+</div>
+
+<div class="hero">
+  <div class="wrap">
+    <p class="eyebrow">유앤김패밀리 · 은퇴부부 자유여행 통합본</p>
+    <h1>크로아티아 7박8일<br>자그레브 → 플리트비체 → 자다르 → 스플리트 → 두브로브니크</h1>
+    <p class="lead">업로드하신 3개 자료(엑셀 일정표, 은퇴부부 PDF 보고서, 유튜브 요약 이미지)를 하나의 동선으로 통합했습니다. 출입국은 자그레브 IN · 두브로브니크 OUT(오픈조 항공)으로 역주행 없이 남하하며, 각 날짜마다 지도·장소·주소를 바로 내비게이션 앱에 붙여넣을 수 있게 정리했습니다.</p>
+    <div class="hero-meta">
+      <span>자그레브 1박</span>
+      <span>플리트비체 1박</span>
+      <span>자다르 1박</span>
+      <span>스플리트 2박</span>
+      <span>두브로브니크 2박</span>
+      <span>부부 2인 · 도어투도어 전용차량 기준</span>
+    </div>
+    <div class="route-svg-box">
+      <svg viewBox="0 0 720 260" xmlns="http://www.w3.org/2000/svg" width="100%" height="auto" role="img" aria-label="크로아티아 동선 지도">
+        <defs>
+          <marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#C99A3E"/>
+          </marker>
+        </defs>
+        <!-- coastline hint -->
+        <path d="M120,20 Q90,80 130,140 Q160,190 140,240" fill="none" stroke="#2C557F" stroke-width="1" opacity="0.35"/>
+        <!-- route path -->
+        <path d="M120,40 L200,60 L210,110 Q230,150 220,200" fill="none" stroke="#C99A3E" stroke-width="2.5" stroke-dasharray="1 8" stroke-linecap="round" marker-end="url(#arrow)"/>
+        <!-- stops -->
+        <g font-family="Noto Sans KR, sans-serif">
+          <circle cx="120" cy="40" r="7" fill="#BC5B39"/>
+          <text x="134" y="36" font-size="13" fill="#0F3559" font-weight="700">① 자그레브</text>
+          <text x="134" y="52" font-size="10.5" fill="#5B6B4F">1박 · 시내 도보</text>
+
+          <circle cx="150" cy="78" r="5.5" fill="#5B6B4F"/>
+          <text x="162" y="82" font-size="11" fill="#5B6B4F">라스토케(경유)</text>
+
+          <circle cx="200" cy="60" r="7" fill="#BC5B39"/>
+          <text x="214" y="56" font-size="13" fill="#0F3559" font-weight="700">② 플리트비체</text>
+          <text x="214" y="72" font-size="10.5" fill="#5B6B4F">1박 · 국립공원</text>
+
+          <circle cx="210" cy="110" r="7" fill="#BC5B39"/>
+          <text x="224" y="106" font-size="13" fill="#0F3559" font-weight="700">③ 자다르</text>
+          <text x="224" y="122" font-size="10.5" fill="#5B6B4F">1박 · 바다오르간</text>
+
+          <circle cx="220" cy="160" r="7" fill="#BC5B39"/>
+          <text x="234" y="156" font-size="13" fill="#0F3559" font-weight="700">④ 스플리트</text>
+          <text x="234" y="172" font-size="10.5" fill="#5B6B4F">2박 · 궁전 구시가</text>
+
+          <circle cx="205" cy="205" r="5.5" fill="#5B6B4F"/>
+          <text x="217" y="209" font-size="11" fill="#5B6B4F">말리 스톤(경유·굴요리)</text>
+
+          <circle cx="220" cy="230" r="7" fill="#BC5B39"/>
+          <text x="234" y="226" font-size="13" fill="#0F3559" font-weight="700">⑤ 두브로브니크</text>
+          <text x="234" y="242" font-size="10.5" fill="#5B6B4F">2박 · 성벽·스르지산</text>
+        </g>
+      </svg>
+      <p class="cap">전용차량(도어투도어) 기준 남하 동선 — 항공은 자그레브 IN / 두브로브니크 OUT</p>
+    </div>
+  </div>
+</div>
+
+<section id="compare" class="alt">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="kicker">STEP 1 — 자료 종합</p>
+      <h2>업로드하신 3개 자료, 이렇게 다릅니다</h2>
+      <p>엑셀·PDF·이미지(유튜브 요약) 세 자료는 도시 구성과 우선순위가 조금씩 달랐습니다. 아래는 각 자료의 핵심과, 이를 어떻게 합쳤는지 정리한 결론입니다.</p>
+    </div>
+    <div class="cmp-grid">
+      <div class="cmp-card">
+        <span class="tag">자료① 엑셀</span>
+        <h3>크로아티아 7일 자유여행 (남부 골든루트)</h3>
+        <ul>
+          <li>자그레브 → 플리트비체 → 자다르 → 스플리트 → 흐바르 → 두브로브니크</li>
+          <li>도시 간 버스·페리(카타마란) 이용, 렌터카 불필요</li>
+          <li>숙소·맛집 평점 리스트가 상세함 (호텔 예제로, 코르나로, 흐바르 등)</li>
+        </ul>
+      </div>
+      <div class="cmp-card">
+        <span class="tag">자료② PDF</span>
+        <h3>은퇴부부 6박7일 (오픈조 항공 설계)</h3>
+        <ul>
+          <li>두브로브니크 IN → 스플리트 → 자그레브 OUT, 역주행 없는 동선</li>
+          <li>플리트비체는 시간 부족으로 제외, 대신 시니어 보행 동선(하루 5~8km) 설계 상세</li>
+          <li>엘리베이터·평지 위주 숙소, 오전 성벽투어 등 체력관리 팁 풍부</li>
+        </ul>
+      </div>
+      <div class="cmp-card">
+        <span class="tag">자료③ 이미지 요약</span>
+        <h3>11월 1일 출발, 동계 비수기 전용차량 일정</h3>
+        <ul>
+          <li>자그레브 → 라스토케 → 플리트비체 → 자다르 → 스플리트 → 스톤 → 두브로브니크</li>
+          <li>도어투도어 전용차량(데이트립 등) 이용, 짐 걱정 없는 이동</li>
+          <li>일몰·동계 운영시간(성벽 09~15시 등) 반영이 정교함</li>
+        </ul>
+      </div>
+    </div>
+    <div class="verdict">
+      <b>통합 결론 —</b> 자료③의 <b>전용차량 도어투도어 동선</b>(자그레브→라스토케→플리트비체→자다르→스플리트→말리스톤→두브로브니크)을 뼈대로 삼고, 자료①의 <b>숙소·맛집 리스트</b>를 채워넣었습니다. 자료②의 은퇴부부 체력관리 원칙(평지 위주, 엘리베이터 숙소, 성벽은 오전, 하루 60~90분 휴식, 스플리트·두브로브니크 2박 연박)을 전 일정에 적용해 부부 두 분께 무리 없는 <b>7박8일</b>로 재구성했습니다.
+    </div>
+  </div>
+</section>
+
+<section id="route">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="kicker">STEP 2 — 전체 흐름</p>
+      <h2>7박8일 한눈에 보기</h2>
+      <p>날짜는 아직 미정이므로 D1~D8로 표기했습니다. 10월 하순~11월 초 비수기 출발 시 이 표 그대로 대입하시면 됩니다.</p>
+    </div>
+    <div class="scrollx">
+    <table class="ov-table">
+      <thead><tr><th>일차</th><th>구간</th><th>핵심 일정</th><th>숙박도시</th><th>이동수단</th></tr></thead>
+      <tbody>
+        <tr><td class="d">D1</td><td>인천 → 자그레브</td><td>경유편, 저녁 도착·체크인</td><td>자그레브</td><td>항공(경유)</td></tr>
+        <tr><td class="d">D2</td><td>자그레브 시내</td><td>돌라츠 시장·대성당·성 마르코 성당·구시가</td><td>자그레브</td><td>도보</td></tr>
+        <tr><td class="d">D3</td><td>자그레브→라스토케(경유)→플리트비체</td><td>라스토케 송어요리 점심, 오후 공원 도착</td><td>플리트비체</td><td>전용차량 약 2시간</td></tr>
+        <tr><td class="d">D4</td><td>플리트비체→자다르</td><td>하부호수 트레킹, 오후 이동 후 바다오르간·일몰</td><td>자다르</td><td>전용차량 약 1시간45분</td></tr>
+        <tr><td class="d">D5</td><td>자다르→스플리트</td><td>구시가 산책 후 이동, 디오클레티아누스 궁전</td><td>스플리트(1/2)</td><td>전용차량 약 1시간40분</td></tr>
+        <tr><td class="d">D6</td><td>스플리트 시내</td><td>리바 해변·마르얀 언덕, 연박 활용 휴식</td><td>스플리트(2/2)</td><td>도보</td></tr>
+        <tr><td class="d">D7</td><td>스플리트→말리스톤(경유)→두브로브니크</td><td>스톤 굴 요리 점심, 스트라둔 거리 저녁 산책</td><td>두브로브니크(1/2)</td><td>전용차량 약 2시간</td></tr>
+        <tr><td class="d">D8</td><td>두브로브니크</td><td>오전 성벽 투어 → 스르지산 케이블카 일몰 만찬</td><td>두브로브니크(2/2)</td><td>도보+케이블카</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+</section>
+
+<section id="days" class="alt">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="kicker">STEP 3 — 일자별 상세</p>
+      <h2>날짜별 시간표 · 지도 · 주소</h2>
+      <p>각 장소 옆 <b>[주소 복사]</b>를 누르면 클립보드에 저장되어 우버·볼트·구글맵·티맵 등 어떤 내비게이션 앱에도 바로 붙여넣을 수 있습니다. <b>[지도]</b>는 구글맵 검색으로 바로 연결됩니다.</p>
+    </div>
+
+    <!-- DAY 1 -->
+    <div class="day" id="d1">
+      <div class="day-head"><span class="day-num">1</span><h3>인천 → 자그레브 도착</h3></div>
+      <div class="day-sub">경유편 이용 · 도착 후 체크인 · 무리한 일정 없이 휴식</div>
+      <div class="day-body">
+        <div>
+          <ul class="timeline">
+            <li><time>도착 후</time><div>공항 → 호텔 전용차량 또는 공식 택시 이동 (약 25~30분)<span class="note">캐리어를 끌 필요 없는 도어투도어 픽업 예약 권장 (Welcome Pickups 등)</span></div></li>
+            <li><time>체크인</time><div>호텔 체크인 · 60분 휴식<span class="note">엘리베이터 인접 객실, 욕조보다 샤워부스 요청</span></div></li>
+            <li><time>저녁</time><div>반 옐라치치 광장 인근 평지 산책 후 슈트루클리(전통 치즈페이스트리) 저녁<span class="note">La Štruk — 짧은 거리만 걷고 일찍 취침</span></div></li>
+          </ul>
+        </div>
+        <div>
+          <div class="mapbox"><iframe loading="lazy" src="https://www.openstreetmap.org/export/embed.html?bbox=15.9519%2C45.7950%2C16.0119%2C45.8350&layer=mapnik&marker=45.8150%2C15.9819"></iframe></div>
+        </div>
+      </div>
+      <div class="stay-box"><span class="label">숙박</span>에스플라나드 자그레브 호텔 (자그레브역 인근, 1925년 개관 5성급)</div>
+    </div>
+
+    <!-- DAY 2 -->
+    <div class="day" id="d2">
+      <div class="day-head"><span class="day-num">2</span><h3>자그레브 구시가 도보 관광</h3></div>
+      <div class="day-sub">핵심 보행 3~4km, 평지 위주 · 자그레브 2번째 밤</div>
+      <div class="day-body">
+        <div>
+          <ul class="timeline">
+            <li><time>09:00</time><div>돌라츠 시장(Dolac Market) 산책<span class="note">오전 방문 추천 — 현지 농산물·꽃 시장</span></div></li>
+            <li><time>10:30</time><div>자그레브 대성당 외관 → 성 마르코 성당(모자이크 지붕)</div></li>
+            <li><time>12:00</time><div>Restoran Boban에서 점심<span class="note">스테이크·파스타, 미슐랭 가이드 언급</span></div></li>
+            <li><time>14:00</time><div>반 옐라치치 광장 → 트칼치체바 거리 카페 휴식<span class="note">오르막이 있는 로트르슈차크 탑은 택시/생략 선택</span></div></li>
+          </ul>
+        </div>
+        <div>
+          <div class="mapbox"><iframe loading="lazy" src="https://www.openstreetmap.org/export/embed.html?bbox=15.9619%2C45.8050%2C16.0019%2C45.8280&layer=mapnik&marker=45.8135%2C15.9773"></iframe></div>
+        </div>
+      </div>
+      <div class="stay-box"><span class="label">숙박</span>에스플라나드 자그레브 호텔 (2박째)</div>
+    </div>
+
+    <!-- DAY 3 -->
+    <div class="day" id="d3">
+      <div class="day-head"><span class="day-num">3</span><h3>자그레브 → 라스토케(경유) → 플리트비체</h3></div>
+      <div class="day-sub">전용차량 약 2시간, 라스토케 점심 체류 포함</div>
+      <div class="day-body">
+        <div>
+          <ul class="timeline">
+            <li><time>09:30</time><div>호텔 로비 픽업, 전용차량으로 라스토케 이동<span class="note">데이트립(mydaytrip.com) 등으로 사전 예약, 캐리어는 차량 내 보관</span></div></li>
+            <li><time>11:00</time><div>라스토케 폭포 마을 산책, 1급수 송어구이 점심 (약 2시간 체류)</div></li>
+            <li><time>13:30</time><div>플리트비체로 이동 (약 30분)</div></li>
+            <li><time>14:00</time><div>호텔 체크인 후 하부호수(Lower Lakes) 코스 초입 산책<span class="note">11월 성수기 대비 입장료 대폭 할인, 07:00~16:00 운영(입장마감 14:00)</span></div></li>
+          </ul>
+        </div>
+        <div>
+          <div class="mapbox"><iframe loading="lazy" src="https://www.openstreetmap.org/export/embed.html?bbox=15.5150%2C44.8350%2C15.6850%2C44.9000&layer=mapnik&marker=44.8654%2C15.6001"></iframe></div>
+        </div>
+      </div>
+      <div class="stay-box"><span class="label">숙박</span>호텔 예제로(Hotel Jezero) — 국립공원 입구2 도보권</div>
+    </div>
+
+    <!-- DAY 4 -->
+    <div class="day" id="d4">
+      <div class="day-head"><span class="day-num">4</span><h3>플리트비체 국립공원 → 자다르 이동</h3></div>
+      <div class="day-sub">오전 트레킹 + 오후 전용차량 이동(약 1시간45분)</div>
+      <div class="day-body">
+        <div>
+          <ul class="timeline">
+            <li><time>08:00</time><div>하부호수+전기보트 코스, 완만한 트레킹 위주 (고령자 배려 코스 선택 권장, 편한 신발 필수)</div></li>
+            <li><time>12:00</time><div>전용차량으로 자다르 이동</div></li>
+            <li><time>13:45</time><div>구시가 해산물 점심 (Restaurant Bruschetta 등)</div></li>
+            <li><time>15:15</time><div>평지 구시가 산책 → 바다 오르간(Sea Organ) · 태양의 인사(Monument to the Sun)<span class="note">일몰 무렵(16:45~17:00) 방문이 하이라이트</span></div></li>
+          </ul>
+        </div>
+        <div>
+          <div class="mapbox"><iframe loading="lazy" src="https://www.openstreetmap.org/export/embed.html?bbox=15.1900%2C44.0994%2C15.2700%2C44.1394&layer=mapnik&marker=44.1194%2C15.2314"></iframe></div>
+        </div>
+      </div>
+      <div class="stay-box"><span class="label">숙박</span>A'mare Hotel Zadar — 구시가 도보 5~10분</div>
+    </div>
+
+    <!-- DAY 5 -->
+    <div class="day" id="d5">
+      <div class="day-head"><span class="day-num">5</span><h3>자다르 → 스플리트 이동</h3></div>
+      <div class="day-sub">전용차량 약 1시간40분 · 스플리트 연박 시작(2박)</div>
+      <div class="day-body">
+        <div>
+          <ul class="timeline">
+            <li><time>오전</time><div>호텔 조식 후 체크아웃, 여유롭게 자다르 산책</div></li>
+            <li><time>11:00</time><div>전용차량으로 스플리트 이동</div></li>
+            <li><time>13:00</time><div>디오클레티아누스 궁전 도착, 골든게이트→페리스타일→대성당 도보 관광</div></li>
+            <li><time>18:00</time><div>지중해 파인다이닝 & 와인 만찬 (Bokeria Kitchen & Wine 등)</div></li>
+          </ul>
+        </div>
+        <div>
+          <div class="mapbox"><iframe loading="lazy" src="https://www.openstreetmap.org/export/embed.html?bbox=16.4102%2C43.4881%2C16.4702%2C43.5281&layer=mapnik&marker=43.5081%2C16.4402"></iframe></div>
+        </div>
+      </div>
+      <div class="stay-box"><span class="label">숙박</span>코르나로 호텔(Cornaro Hotel) — 궁전 도보 3~5분 (1/2박)</div>
+    </div>
+
+    <!-- DAY 6 -->
+    <div class="day" id="d6">
+      <div class="day-head"><span class="day-num">6</span><h3>스플리트 시내 마무리 관광 · 휴식</h3></div>
+      <div class="day-sub">연박 활용, 체력 안배일</div>
+      <div class="day-body">
+        <div>
+          <ul class="timeline">
+            <li><time>09:00</time><div>궁전 지하홀 관광, 리바(Riva) 해변 산책로 노천카페</div></li>
+            <li><time>12:30</time><div>Konoba Matejuska 등에서 현지 해산물 점심</div></li>
+            <li><time>14:30</time><div>호텔 복귀 후 루프탑 테라스·스파 휴식<span class="note">마르얀 언덕은 경사 있으니 컨디션 봐서 선택</span></div></li>
+          </ul>
+        </div>
+        <div>
+          <div class="mapbox"><iframe loading="lazy" src="https://www.openstreetmap.org/export/embed.html?bbox=16.4102%2C43.4881%2C16.4702%2C43.5281&layer=mapnik&marker=43.5081%2C16.4402"></iframe></div>
+        </div>
+      </div>
+      <div class="stay-box"><span class="label">숙박</span>코르나로 호텔(Cornaro Hotel) (2/2박)</div>
+    </div>
+
+    <!-- DAY 7 -->
+    <div class="day" id="d7">
+      <div class="day-head"><span class="day-num">7</span><h3>스플리트 → 말리 스톤(경유) → 두브로브니크</h3></div>
+      <div class="day-sub">전용차량 약 2시간, 굴 요리 점심 체류 포함</div>
+      <div class="day-body">
+        <div>
+          <ul class="timeline">
+            <li><time>10:00</time><div>호텔 픽업, 남부 해안도로(펠예샤츠 대교) 경유 이동</div></li>
+            <li><time>12:00</time><div>말리 스톤(Mali Ston) 정차, 석화·홍합 요리 점심</div></li>
+            <li><time>14:30</time><div>두브로브니크 이동(약 1시간), 힐튼 임페리얼 체크인</div></li>
+            <li><time>16:30</time><div>필레 게이트 통해 스트라둔 거리(평지 대리석 길) 저녁 산책</div></li>
+          </ul>
+        </div>
+        <div>
+          <div class="mapbox"><iframe loading="lazy" src="https://www.openstreetmap.org/export/embed.html?bbox=18.0644%2C42.6207%2C18.1244%2C42.6807&layer=mapnik&marker=42.6507%2C18.0944"></iframe></div>
+        </div>
+      </div>
+      <div class="stay-box"><span class="label">숙박</span>힐튼 임페리얼 두브로브니크 — 필레 게이트 도보 1~2분 (1/2박)</div>
+    </div>
+
+    <!-- DAY 8 -->
+    <div class="day" id="d8">
+      <div class="day-head"><span class="day-num">8</span><h3>두브로브니크 성벽 · 스르지산 일몰</h3></div>
+      <div class="day-sub">동계 성벽 운영 09:00~15:00 — 반드시 오전에 진행</div>
+      <div class="day-body">
+        <div>
+          <ul class="timeline">
+            <li><time>09:00</time><div>성벽 투어 (완주 약 2km, 계단 다수 — 힘들면 Pile→Mineta 구간만)<span class="note">바람 약한 오전 첫 시간대 추천</span></div></li>
+            <li><time>12:00</time><div>구시가 브런치 후 호텔 복귀, 실내 수영장 휴식</div></li>
+            <li><time>14:40</time><div>택시(15분) 또는 케이블카로 스르지산 이동</div></li>
+            <li><time>15:00</time><div>Restaurant Panorama에서 아드리아해 일몰 감상 만찬<span class="note">창가석 First Row는 사전예약 필수, 11월엔 09:00~17:00만 영업</span></div></li>
+          </ul>
+        </div>
+        <div>
+          <div class="mapbox"><iframe loading="lazy" src="https://www.openstreetmap.org/export/embed.html?bbox=18.0644%2C42.6207%2C18.1244%2C42.6807&layer=mapnik&marker=42.6507%2C18.0944"></iframe></div>
+        </div>
+      </div>
+      <div class="stay-box"><span class="label">숙박</span>힐튼 임페리얼 두브로브니크 (2/2박) · 다음날 자유일 후 출국</div>
+    </div>
+
+    <div class="verdict" style="margin-top:22px;">
+      <b>확장 옵션 —</b> 일정에 여유를 두고 싶다면 D8~D9 사이에 <b>두브로브니크 자유일</b>을 하루 추가해 8박9일로, 또는 D5 스플리트에서 페리로 <b>흐바르 섬(1박)</b>을 끼워 9박10일로 늘릴 수 있습니다(자료① 참고). 반대로 시간이 빠듯하면 플리트비체를 스킵하고 자료②의 6박7일(두브로브니크→스플리트→자그레브) 구성으로 되돌아갈 수 있습니다.
+    </div>
+  </div>
+</section>
+
+<section id="stay">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="kicker">STEP 4 — 숙소 · 맛집</p>
+      <h2>도시별 숙소·맛집 마스터 리스트</h2>
+      <p>3개 자료의 추천을 도시 순서대로 정리했습니다. 주소는 내비게이션·우버 앱에 바로 붙여넣을 수 있습니다.</p>
+    </div>
+    <div class="scrollx">
+    <table class="master-table">
+      <thead><tr><th>도시</th><th>이름</th><th>구분</th><th>주소</th><th></th></tr></thead>
+      <tbody id="stayTableBody"></tbody>
+    </table>
+    </div>
+  </div>
+</section>
+
+<section id="transport" class="alt">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="kicker">STEP 5 — 이동수단</p>
+      <h2>도시 간 이동 · 시내 이동 가이드</h2>
+      <p>크로아티아는 도시간 전용차량(Private Transfer) 인프라가 잘 갖춰져 있어, 은퇴부부 여행에는 렌터카보다 전용차량+도보 조합을 권합니다.</p>
+    </div>
+    <div class="tr-grid">
+      <div class="tr-card">
+        <h4>도시 간 전용차량 (Door-to-Door)</h4>
+        <p>호텔 로비→호텔 로비, 경유지 체류시간까지 지정 예약. 캐리어는 기사가 차량에 보관. D3·D5·D7 구간에 해당.</p>
+        <div class="app-links">
+          <a class="applink" href="https://www.mydaytrip.com" target="_blank" rel="noopener">Daytrip (mydaytrip.com)</a>
+          <a class="applink" href="https://www.google.com/search?q=Octopus+Transfers+Croatia" target="_blank" rel="noopener">Octopus Transfers</a>
+        </div>
+      </div>
+      <div class="tr-card">
+        <h4>공항 ↔ 호텔</h4>
+        <p>투숙 호텔 컨시어지 픽업 또는 웰컴 픽업스 사전예약 시 입국장에서 이름표 든 기사와 바로 만남.</p>
+        <div class="app-links">
+          <a class="applink" href="https://www.welcomepickups.com" target="_blank" rel="noopener">Welcome Pickups</a>
+        </div>
+      </div>
+      <div class="tr-card">
+        <h4>시내 단거리 · 우버/볼트</h4>
+        <p>스르지산 왕복, 저녁 식당 이동 등 짧은 구간은 현지에서 앱 호출 시 3~5분 내 배차. 자그레브·스플리트·두브로브니크에서 이용 가능(볼트가 커버리지 더 넓음).</p>
+        <div class="app-links">
+          <a class="applink" href="https://bolt.eu" target="_blank" rel="noopener">Bolt 앱</a>
+          <a class="applink" href="https://www.uber.com" target="_blank" rel="noopener">Uber 앱</a>
+        </div>
+      </div>
+      <div class="tr-card">
+        <h4>도시 간 버스 · 국내선</h4>
+        <p>전용차량 대신 예산을 아끼려면 FlixBus·현지버스(자다르↔스플리트 등)를, 스플리트↔자그레브처럼 장거리는 국내선(약 50분)을 고려할 수 있습니다. 정확한 시간표는 출발일 기준 재조회 필요.</p>
+        <div class="app-links">
+          <a class="applink" href="https://www.getbybus.com" target="_blank" rel="noopener">GetByBus 시간표</a>
+          <a class="applink" href="https://www.croatiaairlines.com" target="_blank" rel="noopener">Croatia Airlines</a>
+        </div>
+      </div>
+      <div class="tr-card">
+        <h4>렌터카 이용 시 참고</h4>
+        <p>구시가 대부분이 차량 진입 제한(올드타운) 지역이라 렌터카는 오히려 부담이 될 수 있습니다. 굳이 이용한다면 플리트비체~자다르~스플리트 구간만 렌트하고 두브로브니크 구간은 반납 후 전용차량을 권합니다. 국제운전면허증 필수, 유료도로(A1) 통행권 준비.</p>
+      </div>
+      <div class="tr-card">
+        <h4>흐바르 섬 확장 시 (선택)</h4>
+        <p>스플리트↔흐바르는 카타마란 페리로 약 1시간. 성수기엔 좌석 매진이 빠르니 승선권 사전 예매 권장.</p>
+        <div class="app-links">
+          <a class="applink" href="https://www.jadrolinija.hr" target="_blank" rel="noopener">Jadrolinija 페리</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="budget">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="kicker">STEP 6 — 예산</p>
+      <h2>부부 2인 예상 예산 (7박8일)</h2>
+      <p>자료①·②의 비수기 기준치를 병합한 계획용 범위입니다. 실제 견적이 아니며 예약 시점·항공 경유지에 따라 달라집니다.</p>
+    </div>
+    <table class="budget-table">
+      <thead><tr><th>항목</th><th>절약형</th><th>권장</th><th>비고</th></tr></thead>
+      <tbody>
+        <tr><td>국제선(오픈조, 2인)</td><td class="num">240~320만원</td><td class="num">320~440만원</td><td>인천-유럽 경유-오픈조, 위탁수하물 확인</td></tr>
+        <tr><td>숙박 7박(2인)</td><td class="num">140~200만원</td><td class="num">200~290만원</td><td>조식 포함 4~5성급, 비수기 요금</td></tr>
+        <tr><td>도시 간 전용차량</td><td class="num">100~130만원</td><td class="num">130~160만원</td><td>D3·D5·D7 전 구간, 중형세단 1대 단독대절</td></tr>
+        <tr><td>식비 및 카페</td><td class="num">75~95만원</td><td class="num">100~135만원</td><td>1일 1회 파인다이닝 포함</td></tr>
+        <tr><td>입장료·시내교통</td><td class="num">25~40만원</td><td class="num">40~60만원</td><td>플리트비체 동계 할인, 성벽·케이블카 포함</td></tr>
+        <tr class="total"><td>합계 (2인)</td><td class="num">580~785만원</td><td class="num">790~1,085만원</td><td>쇼핑·여행자보험 제외</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="prep" class="alt">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="kicker">STEP 7 — 준비</p>
+      <h2>예약 우선순위 · 시니어 체크리스트</h2>
+    </div>
+    <div class="check-grid">
+      <div class="check-card">
+        <h4>출발 3~5개월 전</h4>
+        <ul>
+          <li>오픈조 국제선(자그레브 IN / 두브로브니크 OUT) 및 무료취소 호텔 예약</li>
+          <li>Restaurant Panorama D8 15:00 창가석 — 비수기에도 빠르게 마감되니 최우선 예약</li>
+          <li>여권 유효기간·해외여행자보험 확인</li>
+        </ul>
+      </div>
+      <div class="check-card">
+        <h4>출발 2~4주 전</h4>
+        <ul>
+          <li>D3·D5·D7 도시 간 전용차량(데이트립 등) 픽업 시간·경유 체류시간 확정</li>
+          <li>차량 등급은 캐리어 2개 이상 여유로운 비즈니스 세단/MPV로 선택</li>
+          <li>두브로브니크 성벽·플리트비체 운영시간 재확인</li>
+        </ul>
+      </div>
+      <div class="check-card">
+        <h4>출발 1주 전</h4>
+        <ul>
+          <li>일기예보·강풍(Bura) 확인, 우천 대체 일정 확정</li>
+          <li>eSIM/로밍, 유로화 소액 현금, 해외결제 카드 2장 분산 보관</li>
+          <li>객실 요청문 재확인: "엘리베이터 인접, 계단 없는 조용한 금연룸, 샤워부스 선호"</li>
+        </ul>
+      </div>
+      <div class="check-card">
+        <h4>시니어 건강 관리 원칙</h4>
+        <ul>
+          <li>하루 핵심 보행 5~8km 이내, 점심 후 60~90분 호텔 휴식</li>
+          <li>성벽·계단 구간은 반드시 오전에, 통증·어지럼 있으면 완주 대신 축소 코스</li>
+          <li>돌바닥·경사 대비 미끄럼 방지 워킹화 필수, 11월 기온 대비 경량패딩·방수재킷</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  자료 3종(엑셀·PDF·이미지) 통합본 · 작성 기준 2026-09-26 · 운영시간·요금·항공 스케줄은 출발일 기준 재확인 필요
+</footer>
+
+<script>
+const STAYS = [
+  {city:"자그레브", name:"에스플라나드 자그레브 호텔", type:"숙소", addr:"Mihanovićeva 1, 10000 Zagreb, Croatia"},
+  {city:"자그레브", name:"La Štruk", type:"맛집", addr:"Skalinska ul. 5, 10000 Zagreb, Croatia"},
+  {city:"자그레브", name:"Restoran Boban", type:"맛집", addr:"Gajeva ul. 9, 10000 Zagreb, Croatia"},
+  {city:"플리트비체", name:"호텔 예제로 (Hotel Jezero)", type:"숙소", addr:"Josipa Jovića 2, 53231 Plitvička Jezera, Croatia"},
+  {city:"자다르", name:"A'mare Hotel Zadar", type:"숙소", addr:"Bana Josipa Jelačića 4a, 23000 Zadar, Croatia"},
+  {city:"자다르", name:"Restaurant Bruschetta", type:"맛집", addr:"Zadar Old Town, 23000 Zadar, Croatia"},
+  {city:"스플리트", name:"코르나로 호텔 (Cornaro Hotel)", type:"숙소", addr:"Sinjska ulica 6, 21000 Split, Croatia"},
+  {city:"스플리트", name:"Konoba Matejuska", type:"맛집", addr:"Tomića Stine 3, 21000 Split, Croatia"},
+  {city:"스플리트", name:"Bokeria Kitchen & Wine", type:"맛집", addr:"Domaldova ul. 8, 21000 Split, Croatia"},
+  {city:"두브로브니크", name:"힐튼 임페리얼 두브로브니크", type:"숙소", addr:"Marijana Blažića 2, 20000 Dubrovnik, Croatia"},
+  {city:"두브로브니크", name:"Hotel Lero (대안 숙소)", type:"숙소", addr:"Iva Vojnovića 14, 20000 Dubrovnik, Croatia"},
+  {city:"두브로브니크", name:"Restaurant Panorama", type:"맛집", addr:"Srđ, Žarkova poljana 4, 20000 Dubrovnik, Croatia"},
+  {city:"두브로브니크", name:"두브로브니크 공항 (DBV)", type:"공항", addr:"Dubrovnik Airport, Ćilipi, 20213 Dubrovnik, Croatia"},
+  {city:"자그레브", name:"자그레브 공항 (ZAG)", type:"공항", addr:"Zagreb Airport, Rudolfa Fizira 1, 10150 Zagreb, Croatia"},
+];
+
+function mapUrl(addr){ return "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(addr); }
+
+function fillStayTable(){
+  const body = document.getElementById('stayTableBody');
+  body.innerHTML = STAYS.map((s,i) => `
+    <tr>
+      <td><span class="city-badge">${s.city}</span></td>
+      <td>${s.name}<br><span style="font-size:11px;color:#8a8a80;">${s.type}</span></td>
+      <td>${s.type}</td>
+      <td>${s.addr}</td>
+      <td class="copyc">
+        <button class="btn-mini" data-addr="${s.addr.replace(/"/g,'&quot;')}" onclick="copyAddr(this)">주소 복사</button>
+        <a class="btn-mini map" href="${mapUrl(s.addr)}" target="_blank" rel="noopener">지도</a>
+      </td>
+    </tr>`).join('');
+}
+fillStayTable();
+
+// generic copy handler for both master table and inline addr-rows
+function copyAddr(btn){
+  const addr = btn.getAttribute('data-addr');
+  const done = () => {
+    const original = btn.textContent;
+    btn.textContent = '복사됨 ✓';
+    btn.classList.add('copied');
+    setTimeout(()=>{ btn.textContent = original; btn.classList.remove('copied'); }, 1500);
+  };
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(addr).then(done).catch(()=>{ fallbackCopy(addr); done(); });
+  } else {
+    fallbackCopy(addr); done();
+  }
+}
+function fallbackCopy(text){
+  const ta = document.createElement('textarea');
+  ta.value = text; ta.style.position='fixed'; ta.style.opacity='0';
+  document.body.appendChild(ta); ta.focus(); ta.select();
+  try{ document.execCommand('copy'); }catch(e){}
+  document.body.removeChild(ta);
+}
+</script>
+</body>
+</html>
