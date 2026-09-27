@@ -261,7 +261,7 @@ footer{padding:26px 20px 40px;text-align:center;font-size:11.5px;color:#8b8a80;}
     <div class="section-head">
       <p class="kicker">MAP — 전체 동선</p>
       <h2>구글 지도로 보는 전체 동선</h2>
-      <p>손가락으로 확대·축소·좌우 이동이 가능합니다. 칩을 눌러 숙소·맛집·관광스팟·공항·대중교통을 원하는 대로 켜고 끌 수 있고, 위 숫자 버튼(1~8)을 누르면 해당 일자 구간으로 지도가 바로 이동합니다.</p>
+      <p>손가락으로 확대·축소·좌우 이동이 가능합니다. 칩을 눌러 숙소·맛집·관광스팟·공항·대중교통을 원하는 대로 켜고 끌 수 있고, 위 숫자 버튼(1~8)을 누르면 해당 일자 구간으로 지도가 바로 이동합니다. 마커 아래 말풍선 배경색은 방문 일차(D1, D2…)에 따라 자동으로 달라집니다.</p>
     </div>
     <div class="legend-row" id="legendRow">
       <span class="legend-chip" data-type="hotel"><span class="sw" style="background:#0F3559">H</span>숙소</span>
@@ -648,6 +648,12 @@ const CAT_COLOR = {hotel:"#0F3559", food:"#BC5B39", spot:"#5B6B4F", airport:"#C9
 const CAT_LABEL = {hotel:"숙소", food:"맛집", spot:"관광스팟", airport:"공항", transit:"대중교통·경유지"};
 const CAT_LETTER = {hotel:"H", food:"E", spot:"P", airport:"A", transit:"T"};
 
+// 말풍선 배경색을 방문 일차(day number)에 따라 회전시켜 날짜별로 구분되게 한다.
+function dayColor(n) {
+  const hue = (n * 47) % 360;
+  return `hsl(${hue}, 58%, 40%)`;
+}
+
 function mapUrl(addr){ return "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(addr); }
 
 function fillStayTable(){
@@ -715,6 +721,7 @@ async function initMasterMap(){
   gMarkers = STAYS.map(s => {
     const color = CAT_COLOR[s.cat];
     const letter = CAT_LETTER[s.cat];
+    const bubbleBg = dayColor(s.day);
     const pin = document.createElement('div');
     pin.style.cssText = "display:flex;align-items:flex-end;gap:4px;cursor:pointer;";
     pin.innerHTML = `
@@ -724,8 +731,8 @@ async function initMasterMap(){
         <path d="M4 4 L27 4 L20 12 L27 20 L4 20 Z" fill="${color}" stroke="#fff" stroke-width="1.6"/>
         <text x="14" y="16" font-size="12" font-weight="700" fill="#fff" font-family="'Noto Sans KR',sans-serif" text-anchor="middle">${letter}</text>
       </svg>
-      <div style="background:rgba(255,252,246,0.96);border:1px solid ${color};border-radius:7px;
-        padding:3px 8px;font-size:11.5px;font-weight:700;color:#20242B;white-space:nowrap;
+      <div style="background:${bubbleBg};border:1px solid ${bubbleBg};border-radius:7px;
+        padding:3px 8px;font-size:11.5px;font-weight:700;color:#ffffff;white-space:nowrap;
         box-shadow:0 1px 4px rgba(0,0,0,.18);font-family:'Noto Sans KR',sans-serif;margin-bottom:8px;">D${s.day} · ${s.name}</div>`;
 
     const marker = new AdvancedMarkerElement({
