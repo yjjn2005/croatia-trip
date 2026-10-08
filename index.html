@@ -1,469 +1,810 @@
-<!doctype html>
-<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>크로아티아 7박 여행앱</title>
-<script src="config.js"></script>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Noto+Sans+KR:wght@400;500;700&display=swap">
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>크로아티아 7박8일 — 통합 여행 노트</title>
+<script>
+  window.GMAPS_LAST_UPDATED = "2026년 9월 26일 07:52";
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@500;700&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-/* Layout: 하단 5탭 모바일 우선 앱. 상단에 여행 요약, 본문은 탭별 단일 컬럼(PC에서는 최대 960px) */
 :root{
-  --bg:#f3f5f4; --surface:#ffffff; --fg:#14232b; --muted:#5a6b73; --line:#d5dde0;
-  --sea:#0c5f7a; --sea-soft:#dcedf2; --stone:#b4552d; --stone-soft:#f7e6dc;
-  --ok:#1f7a4d; --ok-soft:#dff1e7; --warn:#946200; --warn-soft:#fbefcf; --bad:#b3261e; --bad-soft:#fae0de;
-  --display:'Gowun Batang','Noto Serif KR',serif; --body:'Noto Sans KR',system-ui,sans-serif;
+  --navy:#0F3559; --navy-2:#123d66; --terracotta:#BC5B39; --stone:#F1E9DA;
+  --stone-2:#E7DBC4; --ink:#20242B; --olive:#5B6B4F; --gold:#C99A3E;
+  --line:#D8CBAA; --white:#FFFCF6;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
 }
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
-  --bg:#0e1a20; --surface:#16262e; --fg:#e6eef0; --muted:#9db0b8; --line:#2b3f49;
-  --sea:#5cc0df; --sea-soft:#17394a; --stone:#f0a27f; --stone-soft:#3a2418;
-  --ok:#6fd1a0; --ok-soft:#173a2a; --warn:#f0c45a; --warn-soft:#3a2f10; --bad:#ff8f87; --bad-soft:#401b19; color-scheme:dark}}
-:root[data-theme="dark"]{
-  --bg:#0e1a20; --surface:#16262e; --fg:#e6eef0; --muted:#9db0b8; --line:#2b3f49;
-  --sea:#5cc0df; --sea-soft:#17394a; --stone:#f0a27f; --stone-soft:#3a2418;
-  --ok:#6fd1a0; --ok-soft:#173a2a; --warn:#f0c45a; --warn-soft:#3a2f10; --bad:#ff8f87; --bad-soft:#401b19; color-scheme:dark}
-*{box-sizing:border-box}
-html,body{margin:0}
-body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:15px;line-height:1.6;padding-inline:16px;padding-block:0 84px}
-.wrap{max-width:960px;margin-inline:auto}
-header{padding-block:20px 8px}
-h1{font-family:var(--display);font-size:1.7rem;margin:0;line-height:1.25;text-wrap:balance}
-h2{font-family:var(--display);font-size:1.25rem;margin:0 0 10px;text-wrap:balance}
-h3{font-size:1rem;margin:0 0 4px}
-.sub{color:var(--muted);margin:4px 0 0;font-size:.9rem}
-.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
-.chip{font-size:.78rem;padding:2px 10px;border-radius:999px;background:var(--sea-soft);color:var(--sea);font-weight:500}
-.chip.warn{background:var(--warn-soft);color:var(--warn)} .chip.ok{background:var(--ok-soft);color:var(--ok)} .chip.bad{background:var(--bad-soft);color:var(--bad)} .chip.stone{background:var(--stone-soft);color:var(--stone)}
-nav.tabs{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);display:flex;padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px));z-index:5}
-nav.tabs button{flex:1;min-width:0;border:0;background:none;color:var(--muted);font:inherit;font-size:.78rem;padding:8px 2px;border-radius:8px;cursor:pointer}
-nav.tabs button[aria-selected="true"]{color:var(--sea);background:var(--sea-soft);font-weight:700}
-button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,a:focus-visible{outline:2px solid var(--sea);outline-offset:2px}
-section.panel{display:flex;flex-direction:column;gap:14px;padding-block:12px}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:14px;min-width:0}
-.notice{border-radius:8px;padding:10px 12px;font-size:.88rem;background:var(--warn-soft);color:var(--fg);border:1px solid var(--warn)}
-.notice.bad{background:var(--bad-soft);border-color:var(--bad)} .notice.ok{background:var(--ok-soft);border-color:var(--ok)}
-.route{display:flex;flex-direction:column;gap:0}
-.stop{display:grid;grid-template-columns:20px 1fr;gap:10px}
-.stop .rail{display:flex;flex-direction:column;align-items:center}
-.stop .dot{width:14px;height:14px;border-radius:50%;background:var(--sea);margin-top:6px;flex:none}
-.stop .line{flex:1;width:2px;background:var(--line);min-height:20px}
-.stop:last-child .line{display:none}
-.stop .body{padding-bottom:16px;min-width:0}
-.stop .d{font-weight:700;color:var(--sea);font-size:.85rem}
-.legs{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px}
-.leg{padding:10px;border-radius:8px;background:var(--stone-soft);font-size:.88rem}
-.days{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px}
-.days button,.filters button{flex:none;border:1px solid var(--line);background:var(--surface);color:var(--fg);font:inherit;font-size:.85rem;padding:6px 12px;border-radius:999px;cursor:pointer}
-.days button[aria-pressed="true"],.filters button[aria-pressed="true"]{background:var(--sea);color:var(--surface);border-color:var(--sea)}
-.filters{display:flex;gap:6px;flex-wrap:wrap}
-.slot{display:grid;grid-template-columns:72px 1fr;gap:10px;padding-block:10px;border-top:1px solid var(--line)}
-.slot:first-of-type{border-top:0}
-.slot .t{font-size:.8rem;color:var(--muted);font-weight:500}
-ul.plain{margin:6px 0 0;padding-left:18px} ul.plain li{margin:2px 0}
-input[type=search],textarea,select{width:100%;font:inherit;padding:9px 11px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--fg)}
-textarea{min-height:120px;font-family:ui-monospace,Menlo,monospace;font-size:.8rem}
-.place{display:flex;flex-direction:column;gap:6px}
-.place .row{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
-.btn{font:inherit;font-size:.85rem;border:1px solid var(--sea);color:var(--sea);background:transparent;padding:6px 12px;border-radius:8px;cursor:pointer;text-decoration:none;display:inline-block}
-.btn.solid{background:var(--sea);color:var(--surface)} .btn.stone{border-color:var(--stone);color:var(--stone)}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px}
-.check{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-top:1px solid var(--line)}
-.check:first-of-type{border-top:0}
-.check input{width:20px;height:20px;margin-top:2px;flex:none;accent-color:var(--sea)}
-.check label{flex:1;min-width:0}
-.check small{display:block;color:var(--muted)}
-.prog{height:8px;border-radius:99px;background:var(--line);overflow:hidden} .prog i{display:block;height:100%;background:var(--ok);width:0;transition:width .2s}
-table{border-collapse:collapse;width:100%;font-size:.88rem}
-th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
-th{color:var(--muted);font-weight:500;font-size:.8rem}
-.scroll{overflow-x:auto}
-.num{font-variant-numeric:tabular-nums}
-.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(76px + env(safe-area-inset-bottom,0px));background:var(--fg);color:var(--bg);padding:8px 16px;border-radius:999px;font-size:.85rem;z-index:9}
-.themebtn{float:right;font-size:.78rem}
-@media (prefers-reduced-motion:reduce){*{transition:none!important}}
-@media (min-width:700px){nav.tabs{justify-content:center;gap:6px} nav.tabs button{max-width:150px}}
+:root:not([data-theme="light"]){ }
+*{box-sizing:border-box;}
+html,body{margin:0;height:100%;}
+html{scroll-padding-top:56px;}
+body{
+  background:var(--stone); color:var(--ink);
+  font-family:"Noto Sans KR",sans-serif; line-height:1.65;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+h1,h2,h3,.disp{font-family:"Noto Serif KR",serif;}
+img{max-width:100%;}
+a{color:inherit;}
+.wrap{max-width:880px;margin:0 auto;padding:0 20px;}
+
+/* ===== top nav ===== */
+.topbar{
+  position:sticky; top:0; z-index:50; background:rgba(15,53,89,0.96);
+  padding-top:env(safe-area-inset-top,0px); backdrop-filter:blur(6px);
+  border-bottom:1px solid rgba(201,154,62,0.4);
+}
+.topbar-inner{max-width:880px;margin:0 auto;display:flex;align-items:center;gap:14px;padding:10px 20px;overflow-x:auto;}
+.topbar-inner::-webkit-scrollbar{display:none;}
+.brand{color:var(--stone);font-family:"Noto Serif KR",serif;font-size:15px;font-weight:700;white-space:nowrap;flex:none;}
+.topnav{display:flex;gap:4px;}
+.topnav a{white-space:nowrap;color:#D9C9A3;font-size:12.5px;text-decoration:none;padding:6px 10px;border-radius:20px;border:1px solid rgba(217,201,163,0.35);}
+.topnav a:active{background:rgba(201,154,62,0.25);}
+
+/* ===== hero ===== */
+.hero{
+  background:linear-gradient(180deg,var(--navy) 0%, var(--navy-2) 60%, #0c2a49 100%);
+  color:var(--stone); padding:38px 20px 30px;
+}
+.hero .eyebrow{color:var(--gold); font-size:13px; letter-spacing:0.02em; margin:0 0 10px;}
+.hero h1{font-size:30px;line-height:1.32;margin:0 0 12px;color:#fff;}
+.hero p.lead{font-size:14.5px;color:#CFDDEB;max-width:60ch;margin:0 0 20px;}
+.hero-meta{display:flex;flex-wrap:wrap;gap:10px;}
+.hero-meta span{
+  font-size:12.5px;background:rgba(255,255,255,0.08);border:1px solid rgba(201,154,62,0.5);
+  color:#F1E9DA; padding:6px 12px;border-radius:20px;
+}
+.route-svg-box{margin-top:26px;background:rgba(255,255,255,0.04);border:1px solid rgba(201,154,62,0.35);border-radius:14px;padding:10px 6px 4px;}
+.route-svg-box .cap{font-size:11.5px;color:#B9C7D6;text-align:center;margin:6px 0 2px;}
+
+/* ===== sections ===== */
+section{padding:34px 20px;}
+section.alt{background:var(--white);}
+.section-head{margin-bottom:18px;}
+.section-head .kicker{font-size:12px;color:var(--terracotta);font-weight:700;letter-spacing:0.02em;margin:0 0 4px;}
+.section-head h2{font-size:21px;margin:0 0 6px;color:var(--navy);}
+.section-head p{font-size:13.5px;color:#57544A;margin:0;max-width:64ch;}
+
+/* ===== compare cards (3 sources) ===== */
+.cmp-grid{display:grid;grid-template-columns:1fr;gap:12px;}
+.cmp-card{background:var(--white);border:1px solid var(--line);border-radius:12px;padding:16px 18px;}
+.cmp-card .tag{display:inline-block;font-size:11px;background:var(--navy);color:#fff;padding:3px 9px;border-radius:20px;margin-bottom:8px;}
+.cmp-card h3{font-size:15px;margin:0 0 6px;color:var(--ink);}
+.cmp-card ul{margin:0;padding-left:18px;font-size:13px;color:#4B4A43;}
+.cmp-card li{margin-bottom:4px;}
+.verdict{margin-top:14px;background:#FBF3E3;border:1px dashed var(--gold);border-radius:12px;padding:14px 16px;font-size:13.5px;color:#4B4A43;}
+.verdict b{color:var(--terracotta);}
+
+/* ===== itinerary overview table ===== */
+.ov-table{width:100%;border-collapse:collapse;font-size:12.8px;background:var(--white);border:1px solid var(--line);border-radius:10px;overflow:hidden;}
+.ov-table th,.ov-table td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top;}
+.ov-table th{background:var(--navy);color:#fff;font-weight:500;font-size:11.8px;}
+.ov-table tr:last-child td{border-bottom:none;}
+.ov-table .d{font-family:"Noto Serif KR",serif;font-weight:700;color:var(--terracotta);}
+.scrollx{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+
+/* ===== day cards ===== */
+.day{
+  background:var(--white); border:1px solid var(--line); border-radius:16px; padding:20px;
+  margin-bottom:16px; position:relative; scroll-margin-top:64px;
+}
+.day-num{
+  display:inline-flex;align-items:center;justify-content:center;width:34px;height:34px;border-radius:50%;
+  background:var(--terracotta);color:#fff;font-family:"Noto Serif KR",serif;font-weight:700;font-size:14px;flex:none;
+}
+.day-head{display:flex;align-items:center;gap:12px;margin-bottom:4px;}
+.day-head h3{font-size:16.5px;margin:0;color:var(--navy);}
+.day-sub{font-size:12px;color:var(--olive);margin:2px 0 14px 46px;}
+.day-body{display:grid;grid-template-columns:1fr;gap:14px;}
+.timeline{list-style:none;margin:0;padding:0;}
+.timeline li{
+  display:grid;grid-template-columns:52px 1fr;gap:10px;padding:8px 0;border-top:1px dotted var(--line);
+  font-size:13px;
+}
+.timeline li:first-child{border-top:none;}
+.timeline time{color:var(--terracotta);font-weight:700;font-size:12px;padding-top:1px;}
+.timeline .note{color:#6b6a61;font-size:12px;display:block;margin-top:2px;}
+.stay-box{
+  background:var(--stone);border:1px solid var(--line);border-radius:10px;padding:12px 14px;font-size:12.8px;
+}
+.stay-box .label{font-size:11px;color:var(--olive);font-weight:700;margin-bottom:2px;}
+.mapbox{border-radius:10px;overflow:hidden;border:1px solid var(--line);height:190px;}
+.mapbox iframe{width:100%;height:100%;border:0;display:block;filter:saturate(0.9);}
+.addr-list{display:flex;flex-direction:column;gap:8px;}
+.addr-row{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--stone);
+  border:1px solid var(--line);border-radius:10px;padding:9px 12px;
+}
+.addr-row .a-name{font-size:12.8px;font-weight:700;color:var(--ink);}
+.addr-row .a-addr{font-size:11.8px;color:#67665c;margin-top:1px;}
+.addr-actions{display:flex;gap:6px;flex:none;}
+.btn-mini{
+  font-size:11px;border:1px solid var(--navy);color:var(--navy);background:#fff;border-radius:8px;
+  padding:6px 8px;cursor:pointer;white-space:nowrap;text-decoration:none;font-family:inherit;
+}
+.btn-mini.copied{background:var(--olive);border-color:var(--olive);color:#fff;}
+.btn-mini.map{background:var(--navy);color:#fff;border-color:var(--navy);}
+
+/* ===== hotel/restaurant master table ===== */
+.master-table{width:100%;border-collapse:collapse;font-size:12.5px;}
+.master-table th,.master-table td{padding:10px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top;}
+.master-table th{background:var(--navy);color:#fff;font-size:11.5px;font-weight:500;}
+.master-table td.copyc{white-space:nowrap;}
+.city-badge{display:inline-block;font-size:10.5px;background:var(--stone-2);color:var(--navy);border-radius:6px;padding:2px 7px;font-weight:700;}
+
+/* ===== transport cards ===== */
+.tr-grid{display:grid;grid-template-columns:1fr;gap:12px;}
+.tr-card{background:var(--white);border:1px solid var(--line);border-radius:12px;padding:16px 18px;}
+.tr-card h4{margin:0 0 6px;font-size:14.5px;color:var(--terracotta);}
+.tr-card p{margin:0 0 6px;font-size:13px;color:#4B4A43;}
+.tr-card .app-links{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;}
+.applink{font-size:11.5px;border:1px solid var(--line);background:var(--stone);border-radius:20px;padding:5px 10px;text-decoration:none;color:var(--ink);}
+
+/* ===== budget table ===== */
+.budget-table{width:100%;border-collapse:collapse;font-size:13px;}
+.budget-table th,.budget-table td{padding:9px 10px;border-bottom:1px solid var(--line);text-align:left;}
+.budget-table th{background:var(--navy);color:#fff;font-weight:500;font-size:12px;}
+.budget-table td.num{text-align:right;font-variant-numeric:tabular-nums;}
+.budget-table tr.total td{font-weight:700;color:var(--terracotta);border-top:2px solid var(--navy);border-bottom:none;}
+
+/* checklist */
+.check-grid{display:grid;grid-template-columns:1fr;gap:10px;}
+.check-card{background:var(--white);border:1px solid var(--line);border-radius:12px;padding:14px 16px;}
+.check-card h4{margin:0 0 8px;font-size:13.5px;color:var(--navy);}
+.check-card ul{margin:0;padding-left:18px;font-size:12.8px;color:#4B4A43;}
+.check-card li{margin-bottom:5px;}
+
+footer{padding:26px 20px 40px;text-align:center;font-size:11.5px;color:#8b8a80;}
+
+/* ===== luxury refinements ===== */
+.update-badge{
+  display:inline-flex;align-items:center;gap:7px;font-size:11.5px;color:#B9C7D6;
+  border:1px solid rgba(201,154,62,0.5);border-radius:20px;padding:5px 12px 5px 10px;margin-bottom:16px;
+}
+.update-badge .dot{width:6px;height:6px;border-radius:50%;background:var(--gold);flex:none;}
+
+/* day quick-nav pills */
+.day-pillnav{display:flex;flex-wrap:wrap;gap:8px;margin-top:22px;}
+.day-pill{
+  font-family:"Noto Serif KR",serif;font-weight:700;font-size:13px;
+  width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,0.06);border:1px solid rgba(201,154,62,0.55);color:#F1E9DA;
+  text-decoration:none;flex:none;transition:background .15s;
+}
+.day-pill:active{background:var(--gold);color:var(--navy);}
+
+/* master map */
+.legend-row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;}
+.legend-chip{
+  display:inline-flex;align-items:center;gap:6px;font-size:12px;border:1px solid var(--line);
+  background:var(--white);border-radius:20px;padding:6px 12px 6px 8px;cursor:pointer;user-select:none;
+  color:var(--ink); transition:opacity .15s;
+}
+.legend-chip .sw{width:16px;height:16px;border-radius:4px 4px 4px 0;flex:none;display:flex;align-items:center;justify-content:center;color:#fff;font-size:9.5px;font-weight:700;font-family:"Noto Sans KR",sans-serif;}
+.legend-chip.off{opacity:0.35;}
+.mastermap-box{border-radius:16px;overflow:hidden;border:1px solid var(--line);height:420px;box-shadow:0 8px 24px rgba(15,53,89,0.08);}
+.mastermap-box #masterMap{width:100%;height:100%;}
+.map-hint{font-size:11.5px;color:#8b8a80;margin-top:8px;}
+.map-focus-btn{
+  display:inline-flex;align-items:center;gap:6px;font-size:12px;border:1px solid var(--navy);
+  color:var(--navy);background:#fff;border-radius:20px;padding:6px 13px;cursor:pointer;font-family:inherit;
+  margin-top:2px;
+}
+.map-focus-btn:active{background:var(--navy);color:#fff;}
+
+@media(min-width:680px){
+  .hero h1{font-size:36px;}
+  .day-body{grid-template-columns:1.1fr 0.9fr;}
+  .cmp-grid{grid-template-columns:repeat(3,1fr);}
+  .tr-grid{grid-template-columns:repeat(2,1fr);}
+  .check-grid{grid-template-columns:repeat(2,1fr);}
+  .mastermap-box{height:520px;}
+}
 </style>
-</head><body>
+<script>
+  (function(){
+    var s = document.createElement('script');
+    s.src = "https://maps.googleapis.com/maps/api/js?key=AIzaSyAZislK5mCjFvQ_W6_2zbwgrHprBWXUW-U&callback=initMasterMap&loading=async&v=weekly";
+    s.async = true;
+    document.head.appendChild(s);
+  })();
+</script>
+</head>
+<body>
 
-<div class="wrap">
-<header>
-  <button class="btn themebtn" id="themeBtn" type="button">화면 모드</button>
-  <h1>크로아티아 7박 여행앱</h1>
-  <p class="sub">인천 출발 2027년 1월 10일(일) · 현지 7박 8일 · 자그레브 → 플리트비체 → 자다르 → 스플리트 → 두브로브니크</p>
-  <div class="chips">
-    <span class="chip stone">한겨울 일정</span>
-    <span class="chip warn">현지 날짜·예약 미확정</span>
-    <span class="chip">가족 공유용</span>
+<div class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">CROATIA · 7박8일</div>
+    <nav class="topnav">
+      <a href="#map">전체 동선(지도)</a>
+      <a href="#days">일자별 일정</a>
+      <a href="#stay">숙소·맛집</a>
+      <a href="#transport">교통</a>
+      <a href="#budget">예산</a>
+      <a href="#prep">준비물</a>
+    </nav>
   </div>
-</header>
-
-<section class="panel" id="p-route" role="tabpanel"></section>
-<section class="panel" id="p-plan" role="tabpanel" hidden></section>
-<section class="panel" id="p-places" role="tabpanel" hidden></section>
-<section class="panel" id="p-prep" role="tabpanel" hidden></section>
-<section class="panel" id="p-check" role="tabpanel" hidden></section>
 </div>
 
-<nav class="tabs" role="tablist" id="tabs"></nav>
-<div class="toast" id="toast" hidden></div>
+<div class="hero">
+  <div class="wrap">
+    <p class="eyebrow">유앤김패밀리 · 은퇴부부 자유여행</p>
+    <h1>크로아티아<br>7박 8일</h1>
+    <p class="lead">자그레브 IN · 두브로브니크 OUT — 아드리아 해안을 따라 남하하는 7박8일. 도시마다 지도·주소를 내비게이션 앱에 바로 붙여넣을 수 있게 정리했습니다.</p>
+    <span class="update-badge" id="updateBadge"><span class="dot"></span>최종 업데이트 · <span id="updateTime"></span></span>
+    <div class="hero-meta">
+      <span>자그레브 1박</span>
+      <span>플리트비체 1박</span>
+      <span>자다르 1박</span>
+      <span>스플리트 2박</span>
+      <span>두브로브니크 2박</span>
+      <span>부부 2인 · 도어투도어 전용차량 기준</span>
+    </div>
+    <div class="day-pillnav" aria-label="일자 바로가기">
+      <a class="day-pill" href="#map" onclick="focusDay(1);return false;">1</a>
+      <a class="day-pill" href="#map" onclick="focusDay(2);return false;">2</a>
+      <a class="day-pill" href="#map" onclick="focusDay(3);return false;">3</a>
+      <a class="day-pill" href="#map" onclick="focusDay(4);return false;">4</a>
+      <a class="day-pill" href="#map" onclick="focusDay(5);return false;">5</a>
+      <a class="day-pill" href="#map" onclick="focusDay(6);return false;">6</a>
+      <a class="day-pill" href="#map" onclick="focusDay(7);return false;">7</a>
+      <a class="day-pill" href="#map" onclick="focusDay(8);return false;">8</a>
+    </div>
+  </div>
+</div>
+
+<section id="map" class="alt">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="kicker">MAP — 전체 동선</p>
+      <h2>구글 지도로 보는 전체 동선</h2>
+      <p>손가락으로 확대·축소·좌우 이동이 가능합니다. 칩을 눌러 숙소·맛집·관광스팟·공항·대중교통을 원하는 대로 켜고 끌 수 있고, 위 숫자 버튼(1~8)을 누르면 해당 일자 구간으로 지도가 바로 이동합니다. 마커 아래 말풍선 배경색은 방문 일차(D1, D2…)에 따라 자동으로 달라집니다.</p>
+    </div>
+    <div class="legend-row" id="legendRow">
+      <span class="legend-chip" data-type="hotel"><span class="sw" style="background:#0F3559">H</span>숙소</span>
+      <span class="legend-chip" data-type="food"><span class="sw" style="background:#BC5B39">E</span>맛집</span>
+      <span class="legend-chip" data-type="spot"><span class="sw" style="background:#5B6B4F">P</span>관광스팟</span>
+      <span class="legend-chip" data-type="airport"><span class="sw" style="background:#C99A3E">A</span>공항</span>
+      <span class="legend-chip" data-type="transit"><span class="sw" style="background:#7A7A72">T</span>대중교통·경유지</span>
+    </div>
+    <div class="mastermap-box"><div id="masterMap"></div></div>
+    <p class="map-hint">지도 로딩에 잠시 시간이 걸릴 수 있습니다. 마커를 누르면 이름·주소·설명이 표시됩니다.</p>
+  </div>
+</section>
+
+<section id="route">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="kicker">STEP 1 — 전체 흐름</p>
+      <h2>7박8일 한눈에 보기</h2>
+      <p>날짜는 아직 미정이므로 D1~D8로 표기했습니다. 10월 하순~11월 초 비수기 출발 시 이 표 그대로 대입하시면 됩니다.</p>
+    </div>
+    <div class="scrollx">
+    <table class="ov-table">
+      <thead><tr><th>일차</th><th>구간</th><th>핵심 일정</th><th>숙박도시</th><th>이동수단</th></tr></thead>
+      <tbody>
+        <tr><td class="d">D1</td><td>인천 → 자그레브</td><td>경유편, 저녁 도착·체크인</td><td>자그레브</td><td>항공(경유)</td></tr>
+        <tr><td class="d">D2</td><td>자그레브 시내</td><td>돌라츠 시장·대성당·성 마르코 성당·구시가</td><td>자그레브</td><td>도보</td></tr>
+        <tr><td class="d">D3</td><td>자그레브→라스토케(경유)→플리트비체</td><td>라스토케 송어요리 점심, 오후 공원 도착</td><td>플리트비체</td><td>전용차량 약 2시간</td></tr>
+        <tr><td class="d">D4</td><td>플리트비체→자다르</td><td>하부호수 트레킹, 오후 이동 후 바다오르간·일몰</td><td>자다르</td><td>전용차량 약 1시간45분</td></tr>
+        <tr><td class="d">D5</td><td>자다르→스플리트</td><td>구시가 산책 후 이동, 디오클레티아누스 궁전</td><td>스플리트(1/2)</td><td>전용차량 약 1시간40분</td></tr>
+        <tr><td class="d">D6</td><td>스플리트 시내</td><td>리바 해변·마르얀 언덕, 연박 활용 휴식</td><td>스플리트(2/2)</td><td>도보</td></tr>
+        <tr><td class="d">D7</td><td>스플리트→말리스톤(경유)→두브로브니크</td><td>스톤 굴 요리 점심, 스트라둔 거리 저녁 산책</td><td>두브로브니크(1/2)</td><td>전용차량 약 2시간</td></tr>
+        <tr><td class="d">D8</td><td>두브로브니크</td><td>오전 성벽 투어 → 스르지산 케이블카 일몰 만찬</td><td>두브로브니크(2/2)</td><td>도보+케이블카</td></tr>
+      </tbody>
+    </table>
+    </div>
+  </div>
+</section>
+
+<section id="days" class="alt">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="kicker">STEP 2 — 일자별 상세</p>
+      <h2>날짜별 시간표 · 지도 · 주소</h2>
+      <p>각 장소 옆 <b>[주소 복사]</b>를 누르면 클립보드에 저장되어 우버·볼트·구글맵·티맵 등 어떤 내비게이션 앱에도 바로 붙여넣을 수 있습니다. <b>[지도]</b>는 구글맵 검색으로 바로 연결됩니다.</p>
+    </div>
+
+    <!-- DAY 1 -->
+    <div class="day" id="d1">
+      <div class="day-head"><span class="day-num">1</span><h3>인천 → 자그레브 도착</h3></div>
+      <div class="day-sub">경유편 이용 · 도착 후 체크인 · 무리한 일정 없이 휴식</div>
+      <div class="day-body">
+        <div>
+          <ul class="timeline">
+            <li><time>도착 후</time><div>공항 → 호텔 전용차량 또는 공식 택시 이동 (약 25~30분)<span class="note">캐리어를 끌 필요 없는 도어투도어 픽업 예약 권장 (Welcome Pickups 등)</span></div></li>
+            <li><time>체크인</time><div>호텔 체크인 · 60분 휴식<span class="note">엘리베이터 인접 객실, 욕조보다 샤워부스 요청</span></div></li>
+            <li><time>저녁</time><div>반 옐라치치 광장 인근 평지 산책 후 슈트루클리(전통 치즈페이스트리) 저녁<span class="note">La Štruk — 짧은 거리만 걷고 일찍 취침</span></div></li>
+          </ul>
+        </div>
+        <div>
+          <button class="map-focus-btn" onclick="focusDay(1)">🗺️ 이 날 동선 지도에서 보기</button>
+        </div>
+      </div>
+      <div class="stay-box"><span class="label">숙박</span>에스플라나드 자그레브 호텔 (자그레브역 인근, 1925년 개관 5성급)</div>
+    </div>
+
+    <!-- DAY 2 -->
+    <div class="day" id="d2">
+      <div class="day-head"><span class="day-num">2</span><h3>자그레브 구시가 도보 관광</h3></div>
+      <div class="day-sub">핵심 보행 3~4km, 평지 위주 · 자그레브 2번째 밤</div>
+      <div class="day-body">
+        <div>
+          <ul class="timeline">
+            <li><time>09:00</time><div>돌라츠 시장(Dolac Market) 산책<span class="note">오전 방문 추천 — 현지 농산물·꽃 시장</span></div></li>
+            <li><time>10:30</time><div>자그레브 대성당 외관 → 성 마르코 성당(모자이크 지붕)</div></li>
+            <li><time>12:00</time><div>Restoran Boban에서 점심<span class="note">스테이크·파스타, 미슐랭 가이드 언급</span></div></li>
+            <li><time>14:00</time><div>반 옐라치치 광장 → 트칼치체바 거리 카페 휴식<span class="note">오르막이 있는 로트르슈차크 탑은 택시/생략 선택</span></div></li>
+          </ul>
+        </div>
+        <div>
+          <button class="map-focus-btn" onclick="focusDay(2)">🗺️ 이 날 동선 지도에서 보기</button>
+        </div>
+      </div>
+      <div class="stay-box"><span class="label">숙박</span>에스플라나드 자그레브 호텔 (2박째)</div>
+    </div>
+
+    <!-- DAY 3 -->
+    <div class="day" id="d3">
+      <div class="day-head"><span class="day-num">3</span><h3>자그레브 → 라스토케(경유) → 플리트비체</h3></div>
+      <div class="day-sub">전용차량 약 2시간, 라스토케 점심 체류 포함</div>
+      <div class="day-body">
+        <div>
+          <ul class="timeline">
+            <li><time>09:30</time><div>호텔 로비 픽업, 전용차량으로 라스토케 이동<span class="note">데이트립(mydaytrip.com) 등으로 사전 예약, 캐리어는 차량 내 보관</span></div></li>
+            <li><time>11:00</time><div>라스토케 폭포 마을 산책, 1급수 송어구이 점심 (약 2시간 체류)</div></li>
+            <li><time>13:30</time><div>플리트비체로 이동 (약 30분)</div></li>
+            <li><time>14:00</time><div>호텔 체크인 후 하부호수(Lower Lakes) 코스 초입 산책<span class="note">11월 성수기 대비 입장료 대폭 할인, 07:00~16:00 운영(입장마감 14:00)</span></div></li>
+          </ul>
+        </div>
+        <div>
+          <button class="map-focus-btn" onclick="focusDay(3)">🗺️ 이 날 동선 지도에서 보기</button>
+        </div>
+      </div>
+      <div class="stay-box"><span class="label">숙박</span>호텔 예제로(Hotel Jezero) — 국립공원 입구2 도보권</div>
+    </div>
+
+    <!-- DAY 4 -->
+    <div class="day" id="d4">
+      <div class="day-head"><span class="day-num">4</span><h3>플리트비체 국립공원 → 자다르 이동</h3></div>
+      <div class="day-sub">오전 트레킹 + 오후 전용차량 이동(약 1시간45분)</div>
+      <div class="day-body">
+        <div>
+          <ul class="timeline">
+            <li><time>08:00</time><div>하부호수+전기보트 코스, 완만한 트레킹 위주 (고령자 배려 코스 선택 권장, 편한 신발 필수)</div></li>
+            <li><time>12:00</time><div>전용차량으로 자다르 이동</div></li>
+            <li><time>13:45</time><div>구시가 해산물 점심 (Restaurant Bruschetta 등)</div></li>
+            <li><time>15:15</time><div>평지 구시가 산책 → 바다 오르간(Sea Organ) · 태양의 인사(Monument to the Sun)<span class="note">일몰 무렵(16:45~17:00) 방문이 하이라이트</span></div></li>
+          </ul>
+        </div>
+        <div>
+          <button class="map-focus-btn" onclick="focusDay(4)">🗺️ 이 날 동선 지도에서 보기</button>
+        </div>
+      </div>
+      <div class="stay-box"><span class="label">숙박</span>A'mare Hotel Zadar — 구시가 도보 5~10분</div>
+    </div>
+
+    <!-- DAY 5 -->
+    <div class="day" id="d5">
+      <div class="day-head"><span class="day-num">5</span><h3>자다르 → 스플리트 이동</h3></div>
+      <div class="day-sub">전용차량 약 1시간40분 · 스플리트 연박 시작(2박)</div>
+      <div class="day-body">
+        <div>
+          <ul class="timeline">
+            <li><time>오전</time><div>호텔 조식 후 체크아웃, 여유롭게 자다르 산책</div></li>
+            <li><time>11:00</time><div>전용차량으로 스플리트 이동</div></li>
+            <li><time>13:00</time><div>디오클레티아누스 궁전 도착, 골든게이트→페리스타일→대성당 도보 관광</div></li>
+            <li><time>18:00</time><div>지중해 파인다이닝 & 와인 만찬 (Bokeria Kitchen & Wine 등)</div></li>
+          </ul>
+        </div>
+        <div>
+          <button class="map-focus-btn" onclick="focusDay(5)">🗺️ 이 날 동선 지도에서 보기</button>
+        </div>
+      </div>
+      <div class="stay-box"><span class="label">숙박</span>코르나로 호텔(Cornaro Hotel) — 궁전 도보 3~5분 (1/2박)</div>
+    </div>
+
+    <!-- DAY 6 -->
+    <div class="day" id="d6">
+      <div class="day-head"><span class="day-num">6</span><h3>스플리트 시내 마무리 관광 · 휴식</h3></div>
+      <div class="day-sub">연박 활용, 체력 안배일</div>
+      <div class="day-body">
+        <div>
+          <ul class="timeline">
+            <li><time>09:00</time><div>궁전 지하홀 관광, 리바(Riva) 해변 산책로 노천카페</div></li>
+            <li><time>12:30</time><div>Konoba Matejuska 등에서 현지 해산물 점심</div></li>
+            <li><time>14:30</time><div>호텔 복귀 후 루프탑 테라스·스파 휴식<span class="note">마르얀 언덕은 경사 있으니 컨디션 봐서 선택</span></div></li>
+          </ul>
+        </div>
+        <div>
+          <button class="map-focus-btn" onclick="focusDay(6)">🗺️ 이 날 동선 지도에서 보기</button>
+        </div>
+      </div>
+      <div class="stay-box"><span class="label">숙박</span>코르나로 호텔(Cornaro Hotel) (2/2박)</div>
+    </div>
+
+    <!-- DAY 7 -->
+    <div class="day" id="d7">
+      <div class="day-head"><span class="day-num">7</span><h3>스플리트 → 말리 스톤(경유) → 두브로브니크</h3></div>
+      <div class="day-sub">전용차량 약 2시간, 굴 요리 점심 체류 포함</div>
+      <div class="day-body">
+        <div>
+          <ul class="timeline">
+            <li><time>10:00</time><div>호텔 픽업, 남부 해안도로(펠예샤츠 대교) 경유 이동</div></li>
+            <li><time>12:00</time><div>말리 스톤(Mali Ston) 정차, 석화·홍합 요리 점심</div></li>
+            <li><time>14:30</time><div>두브로브니크 이동(약 1시간), 힐튼 임페리얼 체크인</div></li>
+            <li><time>16:30</time><div>필레 게이트 통해 스트라둔 거리(평지 대리석 길) 저녁 산책</div></li>
+          </ul>
+        </div>
+        <div>
+          <button class="map-focus-btn" onclick="focusDay(7)">🗺️ 이 날 동선 지도에서 보기</button>
+        </div>
+      </div>
+      <div class="stay-box"><span class="label">숙박</span>힐튼 임페리얼 두브로브니크 — 필레 게이트 도보 1~2분 (1/2박)</div>
+    </div>
+
+    <!-- DAY 8 -->
+    <div class="day" id="d8">
+      <div class="day-head"><span class="day-num">8</span><h3>두브로브니크 성벽 · 스르지산 일몰</h3></div>
+      <div class="day-sub">동계 성벽 운영 09:00~15:00 — 반드시 오전에 진행</div>
+      <div class="day-body">
+        <div>
+          <ul class="timeline">
+            <li><time>09:00</time><div>성벽 투어 (완주 약 2km, 계단 다수 — 힘들면 Pile→Mineta 구간만)<span class="note">바람 약한 오전 첫 시간대 추천</span></div></li>
+            <li><time>12:00</time><div>구시가 브런치 후 호텔 복귀, 실내 수영장 휴식</div></li>
+            <li><time>14:40</time><div>택시(15분) 또는 케이블카로 스르지산 이동</div></li>
+            <li><time>15:00</time><div>Restaurant Panorama에서 아드리아해 일몰 감상 만찬<span class="note">창가석 First Row는 사전예약 필수, 11월엔 09:00~17:00만 영업</span></div></li>
+          </ul>
+        </div>
+        <div>
+          <button class="map-focus-btn" onclick="focusDay(8)">🗺️ 이 날 동선 지도에서 보기</button>
+        </div>
+      </div>
+      <div class="stay-box"><span class="label">숙박</span>힐튼 임페리얼 두브로브니크 (2/2박) · 다음날 자유일 후 출국</div>
+    </div>
+
+    <div class="verdict" style="margin-top:22px;">
+      <b>확장 옵션 —</b> 일정에 여유를 두고 싶다면 D8~D9 사이에 <b>두브로브니크 자유일</b>을 하루 추가해 8박9일로, 또는 D5 스플리트에서 페리로 <b>흐바르 섬(1박)</b>을 끼워 9박10일로 늘릴 수 있습니다.
+    </div>
+  </div>
+</section>
+
+<section id="stay">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="kicker">STEP 3 — 숙소 · 맛집</p>
+      <h2>도시별 숙소·맛집 마스터 리스트</h2>
+      <p>도시 순서대로 정리했습니다. 주소는 내비게이션·우버 앱에 바로 붙여넣을 수 있습니다.</p>
+    </div>
+    <div class="scrollx">
+    <table class="master-table">
+      <thead><tr><th>도시</th><th>이름</th><th>구분</th><th>주소</th><th></th></tr></thead>
+      <tbody id="stayTableBody"></tbody>
+    </table>
+    </div>
+  </div>
+</section>
+
+<section id="transport" class="alt">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="kicker">STEP 4 — 이동수단</p>
+      <h2>도시 간 이동 · 시내 이동 가이드</h2>
+      <p>크로아티아는 도시간 전용차량(Private Transfer) 인프라가 잘 갖춰져 있어, 은퇴부부 여행에는 렌터카보다 전용차량+도보 조합을 권합니다.</p>
+    </div>
+    <div class="tr-grid">
+      <div class="tr-card">
+        <h4>도시 간 전용차량 (Door-to-Door)</h4>
+        <p>호텔 로비→호텔 로비, 경유지 체류시간까지 지정 예약. 캐리어는 기사가 차량에 보관. D3·D5·D7 구간에 해당.</p>
+        <div class="app-links">
+          <a class="applink" href="https://www.mydaytrip.com" target="_blank" rel="noopener">Daytrip (mydaytrip.com)</a>
+          <a class="applink" href="https://www.google.com/search?q=Octopus+Transfers+Croatia" target="_blank" rel="noopener">Octopus Transfers</a>
+        </div>
+      </div>
+      <div class="tr-card">
+        <h4>공항 ↔ 호텔</h4>
+        <p>투숙 호텔 컨시어지 픽업 또는 웰컴 픽업스 사전예약 시 입국장에서 이름표 든 기사와 바로 만남.</p>
+        <div class="app-links">
+          <a class="applink" href="https://www.welcomepickups.com" target="_blank" rel="noopener">Welcome Pickups</a>
+        </div>
+      </div>
+      <div class="tr-card">
+        <h4>시내 단거리 · 우버/볼트</h4>
+        <p>스르지산 왕복, 저녁 식당 이동 등 짧은 구간은 현지에서 앱 호출 시 3~5분 내 배차. 자그레브·스플리트·두브로브니크에서 이용 가능(볼트가 커버리지 더 넓음).</p>
+        <div class="app-links">
+          <a class="applink" href="https://bolt.eu" target="_blank" rel="noopener">Bolt 앱</a>
+          <a class="applink" href="https://www.uber.com" target="_blank" rel="noopener">Uber 앱</a>
+        </div>
+      </div>
+      <div class="tr-card">
+        <h4>도시 간 버스 · 국내선</h4>
+        <p>전용차량 대신 예산을 아끼려면 FlixBus·현지버스(자다르↔스플리트 등)를, 스플리트↔자그레브처럼 장거리는 국내선(약 50분)을 고려할 수 있습니다. 정확한 시간표는 출발일 기준 재조회 필요.</p>
+        <div class="app-links">
+          <a class="applink" href="https://www.getbybus.com" target="_blank" rel="noopener">GetByBus 시간표</a>
+          <a class="applink" href="https://www.croatiaairlines.com" target="_blank" rel="noopener">Croatia Airlines</a>
+        </div>
+      </div>
+      <div class="tr-card">
+        <h4>렌터카 이용 시 참고</h4>
+        <p>구시가 대부분이 차량 진입 제한(올드타운) 지역이라 렌터카는 오히려 부담이 될 수 있습니다. 굳이 이용한다면 플리트비체~자다르~스플리트 구간만 렌트하고 두브로브니크 구간은 반납 후 전용차량을 권합니다. 국제운전면허증 필수, 유료도로(A1) 통행권 준비.</p>
+      </div>
+      <div class="tr-card">
+        <h4>흐바르 섬 확장 시 (선택)</h4>
+        <p>스플리트↔흐바르는 카타마란 페리로 약 1시간. 성수기엔 좌석 매진이 빠르니 승선권 사전 예매 권장.</p>
+        <div class="app-links">
+          <a class="applink" href="https://www.jadrolinija.hr" target="_blank" rel="noopener">Jadrolinija 페리</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="budget">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="kicker">STEP 5 — 예산</p>
+      <h2>부부 2인 예상 예산 (7박8일)</h2>
+      <p>비수기 기준치를 반영한 계획용 범위입니다. 실제 견적이 아니며 예약 시점·항공 경유지에 따라 달라집니다.</p>
+    </div>
+    <table class="budget-table">
+      <thead><tr><th>항목</th><th>절약형</th><th>권장</th><th>비고</th></tr></thead>
+      <tbody>
+        <tr><td>국제선(오픈조, 2인)</td><td class="num">240~320만원</td><td class="num">320~440만원</td><td>인천-유럽 경유-오픈조, 위탁수하물 확인</td></tr>
+        <tr><td>숙박 7박(2인)</td><td class="num">140~200만원</td><td class="num">200~290만원</td><td>조식 포함 4~5성급, 비수기 요금</td></tr>
+        <tr><td>도시 간 전용차량</td><td class="num">100~130만원</td><td class="num">130~160만원</td><td>D3·D5·D7 전 구간, 중형세단 1대 단독대절</td></tr>
+        <tr><td>식비 및 카페</td><td class="num">75~95만원</td><td class="num">100~135만원</td><td>1일 1회 파인다이닝 포함</td></tr>
+        <tr><td>입장료·시내교통</td><td class="num">25~40만원</td><td class="num">40~60만원</td><td>플리트비체 동계 할인, 성벽·케이블카 포함</td></tr>
+        <tr class="total"><td>합계 (2인)</td><td class="num">580~785만원</td><td class="num">790~1,085만원</td><td>쇼핑·여행자보험 제외</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="prep" class="alt">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="kicker">STEP 6 — 준비</p>
+      <h2>예약 우선순위 · 시니어 체크리스트</h2>
+    </div>
+    <div class="check-grid">
+      <div class="check-card">
+        <h4>출발 3~5개월 전</h4>
+        <ul>
+          <li>오픈조 국제선(자그레브 IN / 두브로브니크 OUT) 및 무료취소 호텔 예약</li>
+          <li>Restaurant Panorama D8 15:00 창가석 — 비수기에도 빠르게 마감되니 최우선 예약</li>
+          <li>여권 유효기간·해외여행자보험 확인</li>
+        </ul>
+      </div>
+      <div class="check-card">
+        <h4>출발 2~4주 전</h4>
+        <ul>
+          <li>D3·D5·D7 도시 간 전용차량(데이트립 등) 픽업 시간·경유 체류시간 확정</li>
+          <li>차량 등급은 캐리어 2개 이상 여유로운 비즈니스 세단/MPV로 선택</li>
+          <li>두브로브니크 성벽·플리트비체 운영시간 재확인</li>
+        </ul>
+      </div>
+      <div class="check-card">
+        <h4>출발 1주 전</h4>
+        <ul>
+          <li>일기예보·강풍(Bura) 확인, 우천 대체 일정 확정</li>
+          <li>eSIM/로밍, 유로화 소액 현금, 해외결제 카드 2장 분산 보관</li>
+          <li>객실 요청문 재확인: "엘리베이터 인접, 계단 없는 조용한 금연룸, 샤워부스 선호"</li>
+        </ul>
+      </div>
+      <div class="check-card">
+        <h4>시니어 건강 관리 원칙</h4>
+        <ul>
+          <li>하루 핵심 보행 5~8km 이내, 점심 후 60~90분 호텔 휴식</li>
+          <li>성벽·계단 구간은 반드시 오전에, 통증·어지럼 있으면 완주 대신 축소 코스</li>
+          <li>돌바닥·경사 대비 미끄럼 방지 워킹화 필수, 11월 기온 대비 경량패딩·방수재킷</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  크로아티아 7박8일 최종 일정 · 작성 기준 2026-09-26 · 운영시간·요금·항공 스케줄은 출발일 기준 재확인 필요
+</footer>
 
 <script>
-(function(){
-'use strict';
-/* ---------- 데이터 ---------- */
-var CITIES=['자그레브','플리트비체','자다르','스플리트','두브로브니크'];
-var STOPS=[
- {d:'D1',city:'자그레브',n:'1박',t:'크로아티아 도착 → 자그레브',note:'도착 시각이 늦을 수 있어 첫날은 호텔 체크인과 근처 식사만 잡습니다.'},
- {d:'D2',city:'플리트비체',n:'1박',t:'자그레브 선택 관광 → 라스토케 → 플리트비체',note:'관광과 이동을 합친 압축안입니다. 모든 후보 방문을 보장하지 않습니다.'},
- {d:'D3',city:'자다르',n:'1박',t:'플리트비체 겨울 짧은 코스 → 자다르',note:'겨울에는 보통 하부호수만 열립니다. 당일 개방 코스를 확인합니다.'},
- {d:'D4~D5',city:'스플리트',n:'2박',t:'자다르 → 스플리트, 관광과 휴식',note:'D4 이동 후 오후 산책, D5는 여유 있게 보냅니다.'},
- {d:'D6~D7',city:'두브로브니크',n:'2박',t:'스플리트 → 말리 스톤(선택) → 두브로브니크',note:'케이블카와 Panorama는 1월 휴업이라 일정에서 뺐습니다.'},
- {d:'D8',city:'두브로브니크',n:'없음',t:'두브로브니크 출국',note:'한국 도착일은 항공편 확정 후 계산합니다.'}
-];
-var LEGS=[
- ['D2','자그레브 → 라스토케 → 플리트비체'],
- ['D3','플리트비체 → 자다르'],
- ['D4','자다르 → 스플리트'],
- ['D6','스플리트 → 말리 스톤 → 두브로브니크']
-];
-var DAYS=[
- {k:'D1',title:'D1 도착 · 자그레브',city:'자그레브',slots:[
-  ['도착','자그레브 도착(원본은 경유편 저녁 도착 가정). 공항 픽업 전용차량을 미리 예약해 호텔로 이동. 도착 시각은 항공편 확정 후 입력.'],
-  ['저녁','반 옐라치치 광장 주변을 가볍게 걷고 식사. 겨울은 해가 일찍 집니다.'],
-  ['숙박','자그레브 1박 (후보: 에스플라나드)']]},
- {k:'D2',title:'D2 자그레브 → 라스토케 → 플리트비체',city:'플리트비체',slots:[
-  ['오전','자그레브 선택 관광. 돌라츠 시장, 대성당, 성 마르코 성당 중 골라 체류시간을 정합니다. 원본의 점심 후보는 Restoran Boban입니다.'],
-  ['점심','라스토케 경유 식사(원본은 송어 점심)와 짧은 산책.'],
-  ['오후','플리트비체 인근 숙소로 이동. 오후 공원 입장은 기본 일정에서 제외했습니다.'],
-  ['확인','차량 구간 견적에 경유 시간(식사·관광·휴식)을 따로 적어 요청합니다.']]},
- {k:'D3',title:'D3 플리트비체 → 자다르',city:'자다르',slots:[
-  ['오전','공원 당일 개방 코스 중 짧은 코스. 상부호수는 폐쇄일 수 있습니다.'],
-  ['오후','자다르로 이동. 1월 중순 자다르 일몰은 약 16:40~16:48(현지)이라 도착 후 산책 시간을 넉넉히 둡니다.'],
-  ['저녁','구시가 산책: 바다오르간, 태양에의 인사 (모두 미검증 후보)'],
-  ['숙박','자다르 1박 (후보: A\'mare)']]},
- {k:'D4',title:'D4 자다르 → 스플리트',city:'스플리트',slots:[
-  ['오전','자다르 구시가 마무리 후 출발.'],
-  ['오후','스플리트 체크인, 디오클레시안 궁전 주변 산책.'],
-  ['숙박','스플리트 2박 (후보: Cornaro)']]},
- {k:'D5',title:'D5 스플리트 휴식',city:'스플리트',slots:[
-  ['종일','궁전 지하, 리바 산책로, 시장. 실내 휴식 시간을 넣습니다.'],
-  ['확인','흐바르 페리는 이번 7박 일정에 넣지 않았습니다.']]},
- {k:'D6',title:'D6 스플리트 → 말리 스톤 → 두브로브니크',city:'두브로브니크',slots:[
-  ['오전','스플리트 출발.'],
-  ['점심','말리 스톤 Bota Šare 선택 경유. 1월 영업과 예약 가능 여부를 확인하고, 안 되면 경유를 생략하거나 다른 식당을 고릅니다.'],
-  ['오후','두브로브니크 체크인.'],
-  ['숙박','두브로브니크 2박 (후보: Lero)']]},
- {k:'D7',title:'D7 두브로브니크',city:'두브로브니크',slots:[
-  ['오전','구시가 성벽 짧은 코스 가능 여부 확인 후 결정. 계단, 강풍, 미끄러운 노면에 주의합니다.'],
-  ['오후','구시가 평지 산책과 실내 휴식. 케이블카와 Panorama는 1월 휴업으로 제외.'],
-  ['참고','Lero 수영장은 공식 운영기간(5/1~10/1) 밖이라 이용 제외.']]},
- {k:'D8',title:'D8 두브로브니크 출국',city:'두브로브니크',slots:[
-  ['출국','공항 이동과 반납 시간은 항공편 확정 후 정합니다.'],
-  ['도착','한국 도착일은 항공편에 따라 달라 별도 확인.']]}
-];
-var VERIFIED='공식 사이트에서 주소 확인(2026-10-07)';
-var PLACES=[
- {id:'hotel-esplanade',name:'Hotel Esplanade Zagreb',city:'자그레브',kind:'숙소',ver:true,src:'https://esplanade.hr/contact/',q:'Hotel Esplanade Zagreb'},
- {id:'hotel-cornaro',name:'Cornaro Hotel Split',city:'스플리트',kind:'숙소',ver:true,src:'https://cornarohotel.com/',q:'Cornaro Hotel Split'},
- {id:'hotel-lero',name:'Hotel Lero Dubrovnik',city:'두브로브니크',kind:'숙소',ver:true,addr:'Iva Vojnovića 14, 20000 Dubrovnik',src:'https://hotel-lero.hr/documents/',q:'Hotel Lero Dubrovnik'},
- {id:'hotel-amare',name:'Hotel & Restaurant A\'mare Zadar',city:'자다르',kind:'숙소',ver:true,src:'https://hotelamare.com/contact/',q:'Hotel A\'mare Zadar'},
- {id:'cablecar',name:'Dubrovnik Cable Car 하부역',city:'두브로브니크',kind:'관광',ver:true,src:'https://www.dubrovnikcablecar.com/contact/',q:'Dubrovnik Cable Car lower station',closed:'1월 휴업(공식 월별표). 일정 제외.'},
- {id:'boban',name:'Restoran Boban',city:'자그레브',kind:'식사',q:'Restoran Boban Zagreb',caution:'원본 점심 후보. 겨울 영업·좌석 미확인'},
- {id:'cathedral',name:'Zagreb Cathedral',city:'자그레브',kind:'관광',q:'Zagreb Cathedral'},
- {id:'hilton',name:'Hilton Imperial Dubrovnik',city:'두브로브니크',kind:'숙소',q:'Hilton Imperial Dubrovnik',caution:'원본 숙소. 공식 페이지 접근 확인에 실패해 주소 미검증, 실내 수영장도 보장 안 됨'},
- {id:'dolac',name:'Dolac Market',city:'자그레브',kind:'관광',q:'Dolac Market Zagreb'},
- {id:'stmark',name:'St. Mark\'s Church',city:'자그레브',kind:'관광',q:'St. Mark\'s Church Zagreb'},
- {id:'banjelacic',name:'Ban Jelačić Square',city:'자그레브',kind:'관광',q:'Ban Jelacic Square Zagreb'},
- {id:'rastoke',name:'Rastoke (Slunj)',city:'플리트비체',kind:'관광',q:'Rastoke Slunj'},
- {id:'plitvice1',name:'Plitvice Lakes 입구 1',city:'플리트비체',kind:'관광',q:'Plitvice Lakes National Park Entrance 1',caution:'겨울 코스·입구·매표 미확정'},
- {id:'plitvice2',name:'Plitvice Lakes 입구 2',city:'플리트비체',kind:'관광',q:'Plitvice Lakes National Park Entrance 2',caution:'겨울 코스·입구·매표 미확정'},
- {id:'seaorgan',name:'Sea Organ (바다오르간)',city:'자다르',kind:'관광',q:'Sea Organ Zadar'},
- {id:'sungreet',name:'Greeting to the Sun',city:'자다르',kind:'관광',q:'Greeting to the Sun Zadar'},
- {id:'stdonat',name:'Church of St. Donatus',city:'자다르',kind:'관광',q:'Church of St. Donatus Zadar'},
- {id:'diocletian',name:'Diocletian\'s Palace',city:'스플리트',kind:'관광',q:'Diocletian\'s Palace Split'},
- {id:'peristyle',name:'Peristyle',city:'스플리트',kind:'관광',q:'Peristyle Split'},
- {id:'riva',name:'Riva Promenade',city:'스플리트',kind:'관광',q:'Riva Promenade Split'},
- {id:'marjan',name:'Marjan Hill',city:'스플리트',kind:'관광',q:'Marjan Hill Split'},
- {id:'botasare',name:'Bota Šare Mali Ston',city:'두브로브니크',kind:'식사',addr:'Mali Ston b.b. (공식 사이트, 영업시간 미게시)',q:'Bota Sare Mali Ston',caution:'1월 영업·예약 미확인. 불가 시 경유 생략'},
- {id:'walls',name:'Dubrovnik City Walls',city:'두브로브니크',kind:'관광',q:'Dubrovnik City Walls entrance',caution:'2027년 1월 시간 미확인. 짧은 코스 가능 여부 확인'},
- {id:'pile',name:'Pile Gate',city:'두브로브니크',kind:'관광',q:'Pile Gate Dubrovnik'},
- {id:'stradun',name:'Stradun',city:'두브로브니크',kind:'관광',q:'Stradun Dubrovnik'},
- {id:'onofrio',name:'Onofrio\'s Large Fountain',city:'두브로브니크',kind:'관광',q:'Onofrio Fountain Dubrovnik'},
- {id:'panorama',name:'Panorama Restaurant',city:'두브로브니크',kind:'식사',q:'Panorama Restaurant Dubrovnik',closed:'1월 휴업(공식 월별표). 일정 제외.'},
- {id:'airport-dbv',name:'Dubrovnik Airport',city:'두브로브니크',kind:'교통',q:'Dubrovnik Airport'},
- {id:'airport-zag',name:'Zagreb Airport',city:'자그레브',kind:'교통',q:'Zagreb Airport Franjo Tudman'}
-];
-var PREP=[
- ['flight','항공편 확정','인천 1/10 출발. 현지 도착일과 한국 도착일을 정합니다.'],
- ['dates','D1~D8 달력 날짜 확정','항공편에 맞춰 정합니다.'],
- ['passport','여권 유효기간 확인',''],
- ['hotel-zag','자그레브 1박 숙소 예약','객실·취소조건 확인'],
- ['hotel-plit','플리트비체 인근 1박 숙소 예약','후보 미정'],
- ['hotel-zad','자다르 1박 숙소 예약',''],
- ['hotel-spl','스플리트 2박 숙소 예약',''],
- ['hotel-dbv','두브로브니크 2박 숙소 예약','원본은 Hilton Imperial, 확인된 후보는 Lero. 수영장은 Lero 기준 1월 이용 제외'],
- ['car','전용차량 4구간 재견적·예약','D2·D3·D4·D6. 원본 후보 Daytrip, Octopus Transfers. 경유 식사·관광·휴식시간을 따로 명시'],
- ['pickup','공항 픽업 예약','도착 공항 픽업(Welcome Pickups 등)과 두브로브니크 공항 이동'],
- ['luggage','캐리어 여유 있는 차량 선택','출발 2~4주 전 시간 확정과 함께'],
- ['plitvice','플리트비체 개방 코스·결빙 확인','방문 직전·당일 공지 재확인'],
- ['walls','두브로브니크 성벽 시간 확인','2027년 1월 시간, 짧은 코스'],
- ['bota','말리 스톤 식사 예약 또는 생략 결정',''],
- ['bura','출발 1주 전 날씨·강풍(Bura) 확인','성벽·해안 일정 조정'],
- ['shoes','미끄럼 방지 신발·경량패딩 준비','겨울 노면과 계단'],
- ['insurance','여행자보험',''],
- ['esim','로밍 또는 eSIM',''],
- ['euro','유로 환전·카드 준비',''],
- ['addr','나머지 25개 주소·실제 입구 확인','미검증 후보 장소']
-];
-var STORE='croatia-trip-checks-v1', FMT='croatia-trip-checks', MAXB=20480;
-var IDS=PREP.map(function(p){return p[0]});
+document.getElementById('updateTime').textContent = window.GMAPS_LAST_UPDATED || '';
 
-/* ---------- 유틸 ---------- */
-function $(s,r){return (r||document).querySelector(s)}
-function el(tag,attrs,html){var e=document.createElement(tag);if(attrs)for(var k in attrs)e.setAttribute(k,attrs[k]);if(html!=null)e.innerHTML=html;return e}
-function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
-var tt;function toast(m){var t=$('#toast');t.textContent=m;t.hidden=false;clearTimeout(tt);tt=setTimeout(function(){t.hidden=true},2400)}
-function mapUrl(q){return 'https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(q)}
-function copy(text,okMsg){
-  function fallback(){
-    var ta=el('textarea');ta.value=text;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();
-    var ok=false;try{ok=document.execCommand('copy')}catch(e){}
-    document.body.removeChild(ta);toast(ok?okMsg:'복사하지 못했습니다. 글자를 길게 눌러 직접 복사하세요: '+text);
-  }
-  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(function(){toast(okMsg)},fallback)}else fallback();
+// cat: hotel | food | spot | airport | transit  (색상 구분에 사용)
+const STAYS = [
+  {city:"자그레브", name:"에스플라나드 자그레브 호텔", type:"숙소", cat:"hotel", day:1, addr:"Mihanovićeva 1, 10000 Zagreb, Croatia", lat:45.8081, lng:15.9793, desc:"1925년 개관 5성급, 자그레브역 인근"},
+  {city:"자그레브", name:"La Štruk", type:"맛집", cat:"food", day:2, addr:"Skalinska ul. 5, 10000 Zagreb, Croatia", lat:45.8114, lng:15.9739, desc:"전통 치즈페이스트리 슈트루클리 전문점"},
+  {city:"자그레브", name:"Restoran Boban", type:"맛집", cat:"food", day:2, addr:"Gajeva ul. 9, 10000 Zagreb, Croatia", lat:45.8113, lng:15.9765, desc:"스테이크·파스타, 미슐랭 가이드 언급"},
+  {city:"자그레브", name:"반 옐라치치 광장", type:"관광스팟", cat:"spot", day:2, addr:"Trg bana Josipa Jelačića, 10000 Zagreb, Croatia", lat:45.8131, lng:15.9780, desc:"자그레브 중심 광장"},
+  {city:"자그레브", name:"돌라츠 시장", type:"관광스팟", cat:"spot", day:2, addr:"Dolac 9, 10000 Zagreb, Croatia", lat:45.8140, lng:15.9787, desc:"오전 방문 추천, 현지 농산물 시장"},
+  {city:"자그레브", name:"성 마르코 성당", type:"관광스팟", cat:"spot", day:2, addr:"Trg Svetog Marka 5, 10000 Zagreb, Croatia", lat:45.8127, lng:15.9755, desc:"모자이크 지붕이 상징인 성당"},
+  {city:"자그레브", name:"자그레브 공항 (ZAG)", type:"공항", cat:"airport", day:1, addr:"Zračna luka Zagreb, Rudolfa Fizira 1, 10150 Zagreb, Croatia", lat:45.7429, lng:16.0688, desc:"인천 경유편 도착 공항"},
+  {city:"라스토케", name:"라스토케 폭포마을(경유)", type:"경유지", cat:"transit", day:3, addr:"Rastoke, 47240 Slunj, Croatia", lat:45.1101, lng:15.5761, desc:"송어구이 점심, 약 2시간 체류"},
+  {city:"플리트비체", name:"호텔 예제로 (Hotel Jezero)", type:"숙소", cat:"hotel", day:3, addr:"Josipa Jovića 2, 53231 Plitvička Jezera, Croatia", lat:44.8809, lng:15.5972, desc:"국립공원 입구2 도보권"},
+  {city:"플리트비체", name:"플리트비체 하부호수", type:"관광스팟", cat:"spot", day:4, addr:"Plitvička jezera, 53231 Plitvička Jezera, Croatia", lat:44.8654, lng:15.6001, desc:"하부호수+전기보트 코스"},
+  {city:"자다르", name:"A'mare Hotel Zadar", type:"숙소", cat:"hotel", day:4, addr:"Bana Josipa Jelačića 4a, 23000 Zadar, Croatia", lat:44.1175, lng:15.2280, desc:"구시가 도보 5~10분"},
+  {city:"자다르", name:"Restaurant Bruschetta", type:"맛집", cat:"food", day:4, addr:"Zadar Old Town, 23000 Zadar, Croatia", lat:44.1140, lng:15.2280, desc:"구시가 해산물 레스토랑"},
+  {city:"자다르", name:"바다 오르간 · 태양의 인사", type:"관광스팟", cat:"spot", day:4, addr:"Zadar Sea Organ, Obala kralja Petra Krešimira IV, 23000 Zadar, Croatia", lat:44.1151, lng:15.2214, desc:"일몰 무렵 방문이 하이라이트"},
+  {city:"자다르", name:"자다르 버스터미널(경유)", type:"대중교통", cat:"transit", day:5, addr:"Autobusni kolodvor Zadar, Ante Starčevića 4, 23000 Zadar, Croatia", lat:44.1129, lng:15.2321, desc:"스플리트행 버스 이용 시"},
+  {city:"스플리트", name:"코르나로 호텔 (Cornaro Hotel)", type:"숙소", cat:"hotel", day:5, addr:"Sinjska ulica 6, 21000 Split, Croatia", lat:43.5083, lng:16.4373, desc:"디오클레티아누스 궁전 도보 3~5분"},
+  {city:"스플리트", name:"디오클레티아누스 궁전", type:"관광스팟", cat:"spot", day:5, addr:"Dioklecijanova palača, 21000 Split, Croatia", lat:43.5083, lng:16.4402, desc:"페리스타일·대성당·지하홀"},
+  {city:"스플리트", name:"리바 해변산책로", type:"관광스팟", cat:"spot", day:6, addr:"Obala Hrvatskog narodnog preporoda, 21000 Split, Croatia", lat:43.5069, lng:16.4390, desc:"노천카페가 늘어선 해변 산책로"},
+  {city:"스플리트", name:"Konoba Matejuska", type:"맛집", cat:"food", day:6, addr:"Tomića Stine 3, 21000 Split, Croatia", lat:43.5057, lng:16.4368, desc:"현지인이 인정하는 해산물 전문점"},
+  {city:"스플리트", name:"Bokeria Kitchen & Wine", type:"맛집", cat:"food", day:5, addr:"Domaldova ul. 8, 21000 Split, Croatia", lat:43.5088, lng:16.4407, desc:"지중해 파인다이닝 & 와인"},
+  {city:"스플리트", name:"스플리트 페리·버스터미널(경유)", type:"대중교통", cat:"transit", day:7, addr:"Obala Kneza Domagoja 12, 21000 Split, Croatia", lat:43.5057, lng:16.4423, desc:"두브로브니크행 이동 시 경유"},
+  {city:"말리 스톤", name:"말리 스톤(경유·굴요리)", type:"경유지", cat:"transit", day:7, addr:"Mali Ston, 20230 Ston, Croatia", lat:42.8503, lng:17.6981, desc:"석화·홍합 요리 점심"},
+  {city:"두브로브니크", name:"힐튼 임페리얼 두브로브니크", type:"숙소", cat:"hotel", day:7, addr:"Marijana Blažića 2, 20000 Dubrovnik, Croatia", lat:42.6420, lng:18.1067, desc:"필레 게이트 도보 1~2분"},
+  {city:"두브로브니크", name:"Hotel Lero (대안 숙소)", type:"숙소", cat:"hotel", day:7, addr:"Iva Vojnovića 14, 20000 Dubrovnik, Croatia", lat:42.6396, lng:18.0993, desc:"구시가 인근 대안 숙소"},
+  {city:"두브로브니크", name:"두브로브니크 성벽·스트라둔", type:"관광스팟", cat:"spot", day:8, addr:"City Walls, Dubrovnik, Croatia", lat:42.6414, lng:18.1096, desc:"동계 09:00~15:00 운영, 오전 방문 필수"},
+  {city:"두브로브니크", name:"스르지산 케이블카", type:"관광스팟", cat:"spot", day:8, addr:"Dubrovnik Cable Car, Frana Supila, 20000 Dubrovnik, Croatia", lat:42.6434, lng:18.1088, desc:"일몰 전망대로 이동"},
+  {city:"두브로브니크", name:"Restaurant Panorama", type:"맛집", cat:"food", day:8, addr:"Srđ, Žarkova poljana 4, 20000 Dubrovnik, Croatia", lat:42.6520, lng:18.1104, desc:"아드리아해 일몰 전망 만찬, 사전예약 필수"},
+  {city:"두브로브니크", name:"두브로브니크 공항 (DBV)", type:"공항", cat:"airport", day:8, addr:"Zračna luka Dubrovnik, Ćilipi, 20213 Dubrovnik, Croatia", lat:42.5614, lng:18.2682, desc:"귀국편 출발 공항"},
+];
+
+const CAT_COLOR = {hotel:"#0F3559", food:"#BC5B39", spot:"#5B6B4F", airport:"#C99A3E", transit:"#7A7A72"};
+const CAT_LABEL = {hotel:"숙소", food:"맛집", spot:"관광스팟", airport:"공항", transit:"대중교통·경유지"};
+const CAT_LETTER = {hotel:"H", food:"E", spot:"P", airport:"A", transit:"T"};
+
+// 말풍선 배경색을 방문 일차(day number)에 따라 회전시켜 날짜별로 구분되게 한다.
+function dayColor(n) {
+  const hue = (n * 47) % 360;
+  return `hsl(${hue}, 58%, 40%)`;
 }
 
-/* ---------- 체크 저장 ---------- */
-var checks={}, persist=true;
-function load(){try{var r=localStorage.getItem(STORE);if(r){var o=JSON.parse(r);if(o&&typeof o==='object')checks=o}}catch(e){persist=false}}
-function save(){try{localStorage.setItem(STORE,JSON.stringify(checks))}catch(e){persist=false}}
-function doneIds(){return IDS.filter(function(i){return checks[i]})}
+function mapUrl(addr){ return "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(addr); }
 
-/* ---------- 탭 ---------- */
-var TABS=[['route','전체 동선'],['plan','일정'],['places','장소'],['prep','준비·예산'],['check','검증']];
-var tabs=$('#tabs');
-TABS.forEach(function(t,i){var b=el('button',{type:'button',role:'tab','data-t':t[0],'aria-selected':i===0?'true':'false'},t[1]);tabs.appendChild(b)});
-function show(name){
-  TABS.forEach(function(t){$('#p-'+t[0]).hidden=t[0]!==name});
-  Array.prototype.forEach.call(tabs.children,function(b){b.setAttribute('aria-selected',b.dataset.t===name?'true':'false')});
-  window.scrollTo(0,0);
-  try{sessionStorage.setItem('ct-tab',name)}catch(e){}
+function fillStayTable(){
+  const body = document.getElementById('stayTableBody');
+  body.innerHTML = STAYS.map((s,i) => `
+    <tr>
+      <td><span class="city-badge">${s.city}</span></td>
+      <td>${s.name}<br><span style="font-size:11px;color:#8a8a80;">${s.type} · D${s.day}</span></td>
+      <td>${s.type}</td>
+      <td>${s.addr}</td>
+      <td class="copyc">
+        <button class="btn-mini" data-addr="${s.addr.replace(/"/g,'&quot;')}" onclick="copyAddr(this)">주소 복사</button>
+        <a class="btn-mini map" href="${mapUrl(s.addr)}" target="_blank" rel="noopener">지도</a>
+      </td>
+    </tr>`).join('');
 }
-tabs.addEventListener('click',function(e){var b=e.target.closest('button');if(b)show(b.dataset.t)});
+fillStayTable();
 
-/* ---------- 1. 전체 동선 ---------- */
-(function(){
-  var p=$('#p-route');
-  var h='<div class="card"><h2>숙박 배분 1+1+1+2+2 = 7박</h2><div class="route">';
-  STOPS.forEach(function(s){
-    h+='<div class="stop"><div class="rail"><span class="dot"></span><span class="line"></span></div><div class="body"><div class="d">'+s.d+' · '+s.n+'</div><h3>'+esc(s.t)+'</h3><div class="sub">'+esc(s.note)+'</div></div></div>';
+/* ===== Google 지도 (전체 동선) ===== */
+let gMap = null;
+let gMarkers = [];
+const activeCats = new Set(Object.keys(CAT_COLOR));
+
+// 출발(자그레브 공항) → 종료(두브로브니크 공항)까지의 이동 순서 (화살표 동선용 대표 지점)
+const ROUTE_PATH = [
+  {lat:45.7429, lng:16.0688}, // 자그레브 공항 (출발)
+  {lat:45.8081, lng:15.9793}, // 자그레브 시내
+  {lat:45.1101, lng:15.5761}, // 라스토케
+  {lat:44.8809, lng:15.5972}, // 플리트비체
+  {lat:44.1175, lng:15.2280}, // 자다르
+  {lat:43.5083, lng:16.4373}, // 스플리트
+  {lat:42.8503, lng:17.6981}, // 말리 스톤
+  {lat:42.6420, lng:18.1067}, // 두브로브니크 시내
+  {lat:42.5614, lng:18.2682}, // 두브로브니크 공항 (종료)
+];
+
+async function initMasterMap(){
+  gMap = new google.maps.Map(document.getElementById('masterMap'), {
+    zoom: 8,
+    center: {lat:44.3, lng:16.5},
+    mapId: "DEMO_MAP_ID",
+    gestureHandling: "greedy",
+    streetViewControl: false,
+    fullscreenControl: true,
+    mapTypeControl: false
   });
-  h+='</div></div>';
-  var N=[['자그레브','D1','Zagreb, Croatia',45.815,15.982,'r'],['라스토케','D2 경유','Rastoke Slunj, Croatia',45.122,15.585,'r'],['플리트비체','D2','Plitvice Lakes National Park, Croatia',44.881,15.616,'r'],['자다르','D3','Zadar, Croatia',44.119,15.232,'r'],['스플리트','D4~D5','Split, Croatia',43.508,16.440,'l'],['말리 스톤','D6 선택','Mali Ston, Croatia',42.855,17.696,'l'],['두브로브니크','D6~D8','Dubrovnik, Croatia',42.650,18.094,'l']];
-  function X(lo){return 40+(lo-14.9)*108} function Y(la){return 30+(46.0-la)*150}
-  var svg='<svg viewBox="0 0 440 560" role="img" aria-label="자그레브에서 두브로브니크까지 동선 약도" style="width:100%;height:auto;max-height:620px"><rect x="0" y="0" width="440" height="560" rx="10" fill="var(--sea-soft)"/>';
-  var pts=N.map(function(n){return X(n[4]).toFixed(1)+','+Y(n[3]).toFixed(1)}).join(' ');
-  svg+='<polyline points="'+pts+'" fill="none" stroke="var(--stone)" stroke-width="3" stroke-dasharray="7 5" stroke-linejoin="round"/>';
-  N.forEach(function(n){
-    var x=X(n[4]),y=Y(n[3]),left=n[5]==='l',tx=left?x-14:x+14,an=left?'end':'start',ly=n[0]==='말리 스톤'?y-14:(n[0]==='두브로브니크'?y+10:y);
-    svg+='<a href="'+mapUrl(n[2])+'" target="_blank" rel="noopener"><circle cx="'+x.toFixed(1)+'" cy="'+y.toFixed(1)+'" r="9" fill="var(--sea)" stroke="var(--surface)" stroke-width="3"/><text x="'+tx.toFixed(1)+'" y="'+(ly-1).toFixed(1)+'" text-anchor="'+an+'" font-size="15" font-weight="700" fill="var(--fg)">'+n[0]+'</text><text x="'+tx.toFixed(1)+'" y="'+(ly+15).toFixed(1)+'" text-anchor="'+an+'" font-size="12" fill="var(--muted)">'+n[1]+'</text></a>';
+
+  // 출발→종료 이동 동선을 화살표로 표시
+  const arrowSymbol = { path: google.maps.SymbolPath.FORWARD_CLOSED_ARROW, scale:3.4, strokeColor:"#C99A3E", fillColor:"#C99A3E", fillOpacity:1 };
+  new google.maps.Polyline({
+    path: ROUTE_PATH,
+    geodesic: true,
+    strokeColor: "#C99A3E",
+    strokeOpacity: 0.85,
+    strokeWeight: 3,
+    icons: [{ icon: arrowSymbol, offset: "0%", repeat: "85px" }],
+    map: gMap
   });
-  svg+='<text x="16" y="544" font-size="11" fill="var(--muted)">도시 위치를 이은 약도입니다. 실제 도로와 거리는 다릅니다.</text></svg>';
-  function dir(o,d,w){return 'https://www.google.com/maps/dir/?api=1&travelmode=driving&origin='+encodeURIComponent(o)+'&destination='+encodeURIComponent(d)+(w?'&waypoints='+encodeURIComponent(w):'')}
-  h+='<div class="card" id="gmcard" hidden><h2>동선 지도</h2><div id="gmap" style="width:100%;height:440px;border-radius:10px;background:var(--sea-soft)"></div><p class="sub" id="gmmsg">핀을 누르면 도시 정보와 Google 지도 링크가 열립니다. 장소 메뉴의 "앱 지도에 표시"로 핀을 더할 수 있습니다.</p></div>';
-  h+='<div class="card" id="svgcard"><h2>동선 지도</h2>'+svg+'<div class="row" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:10px"><a class="btn solid" target="_blank" rel="noopener" href="'+dir('Zagreb, Croatia','Dubrovnik, Croatia','Rastoke Slunj, Croatia|Plitvice Lakes National Park, Croatia|Zadar, Croatia|Split, Croatia|Mali Ston, Croatia')+'">Google 지도에서 전체 경로 열기</a></div><p class="sub">도시 이름을 누르면 Google 지도 검색이 새 탭으로 열립니다. 지도 안의 마커와 확대·이동은 이 앱 안에서 쓸 수 없고 Google 지도 앱에서 이어집니다.</p></div>';
-  h+='<div class="card"><h2>차량 이동 4구간</h2><div class="legs">';
-  var LQ={D2:['Zagreb, Croatia','Plitvice Lakes National Park, Croatia','Rastoke Slunj, Croatia'],D3:['Plitvice Lakes National Park, Croatia','Zadar, Croatia',''],D4:['Zadar, Croatia','Split, Croatia',''],D6:['Split, Croatia','Dubrovnik, Croatia','Mali Ston, Croatia']};
-  LEGS.forEach(function(l){var q=LQ[l[0]];h+='<div class="leg"><b>'+l[0]+'</b> '+esc(l[1])+'<br><a target="_blank" rel="noopener" href="'+dir(q[0],q[1],q[2])+'">경로 지도 열기</a></div>'});
-  h+='</div><p class="sub">경유 식사·관광·휴식시간은 순수 주행시간과 나눠서 견적에 적습니다.</p></div>';
-  h+='<div class="card"><h2>이동수단</h2><ul class="plain"><li>도시 간 이동은 도어투도어 전용차량 예약이 기본입니다(원본 후보: Daytrip, Octopus Transfers). 공항 픽업은 Welcome Pickups 등 사전 예약.</li><li>시내 단거리는 우버·볼트.</li><li>예산을 줄이면 플릭스버스, 현지버스, 국내선(스플리트↔자그레브)을 쓸 수 있습니다.</li><li>렌터카는 구시가 차량 진입 제한 때문에 권하지 않습니다.</li></ul></div>';
-  h+='<div class="notice"><b>날짜는 아직 정해지지 않았습니다.</b> 인천 출발은 2027년 1월 10일(일)이고, 크로아티아 도착일과 D1~D8 날짜, 한국 도착일은 항공편이 정해진 뒤 확정합니다.</div>';
-  h+='<div class="card"><h2>1월 일정에서 바뀐 점</h2><ul class="plain"><li>두브로브니크 케이블카와 Panorama 식당은 공식 월별표상 1월 휴업이라 D7에서 뺐습니다.</li><li>플리트비체는 겨울에 보통 하부호수만 열려 D2 오후 입장을 기본 일정에서 뺐습니다.</li><li>성벽 시간은 2027년 1월 기준으로 확인되지 않아 09:00 입장 가정을 지웠습니다.</li><li>흐바르 페리는 이번 7박 일정에 넣지 않았습니다.</li></ul></div>';
-  p.innerHTML=h;
-  /* Google 지도 JavaScript: 키가 있고 허용된 호스팅(GitHub Pages 등)에서만 로드. 아니면 약도로 대체 */
-  var key=window.GMAPS_KEY;
-  if(key&&!/claude\.ai|claudeusercontent/.test(location.host)){
-    var sc=document.createElement('script');
-    window.gm_authFailure=function(){$('#gmcard').hidden=true;$('#svgcard').hidden=false};
-    window.__gm=function(){
-      try{
-        $('#gmcard').hidden=false;$('#svgcard').hidden=true;
-        var map=new google.maps.Map($('#gmap'),{center:{lat:44.4,lng:16.4},zoom:7,mapTypeControl:true,fullscreenControl:true,gestureHandling:'greedy'});
-        var iw=new google.maps.InfoWindow(),b=new google.maps.LatLngBounds(),path=[];
-        N.forEach(function(n){
-          var pos={lat:n[3],lng:n[4]};path.push(pos);b.extend(pos);
-          var m=new google.maps.Marker({position:pos,map:map,title:n[0],label:{text:String(path.length),color:'#fff',fontWeight:'700'}});
-          m.addListener('click',function(){iw.setContent('<b>'+n[0]+'</b><br>'+n[1]+'<br><a target="_blank" rel="noopener" href="'+mapUrl(n[2])+'">Google 지도에서 열기</a>');iw.open(map,m)});
-        });
-        new google.maps.Polyline({path:path,map:map,strokeColor:'#b4552d',strokeOpacity:.9,strokeWeight:3});
-        map.fitBounds(b);
-        var gc=new google.maps.Geocoder();
-        window.showOnMap=function(name,query){
-          gc.geocode({address:query+', Croatia'},function(r,st){
-            if(st!=='OK'||!r[0]){toast('이 장소는 앱 지도에 표시하지 못했습니다. 지도 열기 링크를 쓰세요.');return}
-            var loc=r[0].geometry.location;
-            var m=new google.maps.Marker({position:loc,map:map,title:name,icon:'https://maps.google.com/mapfiles/ms/icons/red-dot.png'});
-            m.addListener('click',function(){iw.setContent('<b>'+name+'</b><br><a target="_blank" rel="noopener" href="'+mapUrl(query)+'">Google 지도에서 열기</a>');iw.open(map,m)});
-            map.panTo(loc);map.setZoom(14);show('route');setTimeout(function(){$('#gmcard').scrollIntoView({behavior:'smooth',block:'start'})},60);
-          });
-        };
-        window.dispatchEvent(new Event('gmready'));
-      }catch(e){$('#gmcard').hidden=true;$('#svgcard').hidden=false}
-    };
-    sc.src='https://maps.googleapis.com/maps/api/js?key='+encodeURIComponent(key)+'&callback=__gm&language=ko&loading=async';
-    sc.async=true;sc.onerror=function(){$('#svgcard').hidden=false};
-    document.head.appendChild(sc);
-  }
-})();
+  new google.maps.Marker({ position: ROUTE_PATH[0], map: gMap, label:{text:"출발", color:"#0F3559", fontWeight:"700", fontSize:"11px"}, icon:{path:google.maps.SymbolPath.CIRCLE, scale:0.1, fillOpacity:0, strokeOpacity:0}, zIndex:1 });
+  new google.maps.Marker({ position: ROUTE_PATH[ROUTE_PATH.length-1], map: gMap, label:{text:"도착", color:"#0F3559", fontWeight:"700", fontSize:"11px"}, icon:{path:google.maps.SymbolPath.CIRCLE, scale:0.1, fillOpacity:0, strokeOpacity:0}, zIndex:1 });
 
-/* ---------- 2. 일정 ---------- */
-(function(){
-  var p=$('#p-plan');
-  p.innerHTML='<div class="days" id="daybar"></div><div id="daybody"></div>';
-  var bar=$('#daybar'),body=$('#daybody'),cur='D1';
-  DAYS.forEach(function(d){bar.appendChild(el('button',{type:'button','data-k':d.k,'aria-pressed':'false'},d.k))});
-  function render(){
-    Array.prototype.forEach.call(bar.children,function(b){b.setAttribute('aria-pressed',b.dataset.k===cur?'true':'false')});
-    var d=DAYS.filter(function(x){return x.k===cur})[0];
-    var h='<div class="card"><h2>'+esc(d.title)+'</h2>';
-    d.slots.forEach(function(s){h+='<div class="slot"><div class="t">'+esc(s[0])+'</div><div>'+esc(s[1])+'</div></div>'});
-    h+='</div>';
-    var ps=PLACES.filter(function(x){return x.city===d.city&&!x.closed&&x.kind!=='교통'});
-    h+='<div class="card"><h3>'+esc(d.city)+' 주변 장소</h3><div class="sub">누르면 지도 검색이 열립니다.</div><ul class="plain">';
-    ps.forEach(function(x){h+='<li><a href="'+mapUrl(x.q)+'" target="_blank" rel="noopener">'+esc(x.name)+'</a>'+(x.ver?'':' <span class="chip warn">미검증</span>')+'</li>'});
-    h+='</ul></div>';
-    body.innerHTML=h;
-  }
-  bar.addEventListener('click',function(e){var b=e.target.closest('button');if(b){cur=b.dataset.k;render()}});
-  render();
-})();
+  const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
 
-/* ---------- 3. 장소 ---------- */
-(function(){
-  var p=$('#p-places');
-  p.innerHTML='<div class="notice">공식 사이트에서 주소를 확인한 곳은 5곳이고, 나머지 25곳은 미검증 후보입니다. 주소 확인은 객실, 좌석, 영업일, 예약 완료를 뜻하지 않습니다. 좌표 마커 대신 주소 검색 링크를 씁니다.</div>'+
-  '<input type="search" id="q" placeholder="장소 이름 또는 주소 검색" aria-label="장소 검색">'+
-  '<div class="filters" id="cf"></div><div class="grid" id="pl"></div>';
-  var cf=$('#cf'),pl=$('#pl'),q=$('#q'),city='전체',cur=[];
-  ['전체'].concat(CITIES).forEach(function(c){cf.appendChild(el('button',{type:'button','data-c':c,'aria-pressed':c==='전체'?'true':'false'},c))});
-  function render(){
-    var s=q.value.trim().toLowerCase();
-    Array.prototype.forEach.call(cf.children,function(b){b.setAttribute('aria-pressed',b.dataset.c===city?'true':'false')});
-    var list=PLACES.filter(function(x){return (city==='전체'||x.city===city)&&(!s||(x.name+' '+x.q+' '+x.city+' '+x.kind).toLowerCase().indexOf(s)>-1)});
-    cur=list;var h='';
-    list.forEach(function(x,i){
-      h+='<div class="card place"><div class="row"><b>'+esc(x.name)+'</b></div><div class="row"><span class="chip">'+esc(x.city)+'</span><span class="chip">'+esc(x.kind)+'</span>'+(x.ver?'<span class="chip ok">주소 확인</span>':'<span class="chip warn">미검증</span>')+(x.closed?'<span class="chip bad">1월 휴업</span>':'')+'</div>';
-      if(x.addr)h+='<div class="sub">주소: '+esc(x.addr)+'</div>';
-      if(x.closed)h+='<div class="sub">'+esc(x.closed)+'</div>';
-      if(x.caution)h+='<div class="sub">확인 필요: '+esc(x.caution)+'</div>';
-      h+='<div class="row"><a class="btn solid" target="_blank" rel="noopener" href="'+mapUrl(x.q)+'">지도에서 열기</a><button class="btn" type="button" data-copy="'+esc(x.q)+'">이름 복사</button>'+(window.showOnMap?'<button class="btn" type="button" data-map="'+i+'">앱 지도에 표시</button>':'')+''+(x.src?'<a class="btn" target="_blank" rel="noopener" href="'+x.src+'">공식 사이트</a>':'')+'</div></div>';
+  const bounds = new google.maps.LatLngBounds();
+  gMarkers = STAYS.map(s => {
+    const color = CAT_COLOR[s.cat];
+    const letter = CAT_LETTER[s.cat];
+    const bubbleBg = dayColor(s.day);
+    const pin = document.createElement('div');
+    pin.style.cssText = "display:flex;align-items:flex-end;gap:4px;cursor:pointer;";
+    pin.innerHTML = `
+      <svg width="30" height="38" viewBox="0 0 30 38" style="flex:none;filter:drop-shadow(0 2px 3px rgba(0,0,0,.4));">
+        <line x1="4" y1="6" x2="4" y2="36" stroke="#3a3a34" stroke-width="2.2"/>
+        <circle cx="4" cy="36.5" r="2.2" fill="#3a3a34"/>
+        <path d="M4 4 L27 4 L20 12 L27 20 L4 20 Z" fill="${color}" stroke="#fff" stroke-width="1.6"/>
+        <text x="14" y="16" font-size="12" font-weight="700" fill="#fff" font-family="'Noto Sans KR',sans-serif" text-anchor="middle">${letter}</text>
+      </svg>
+      <div style="background:${bubbleBg};border:1px solid ${bubbleBg};border-radius:7px;
+        padding:3px 8px;font-size:11.5px;font-weight:700;color:#ffffff;white-space:nowrap;
+        box-shadow:0 1px 4px rgba(0,0,0,.18);font-family:'Noto Sans KR',sans-serif;margin-bottom:8px;">D${s.day} · ${s.name}</div>`;
+
+    const marker = new AdvancedMarkerElement({
+      position: {lat:s.lat, lng:s.lng},
+      map: gMap,
+      title: s.name,
+      content: pin,
+      zIndex: 100 + s.day
     });
-    pl.innerHTML=h||'<div class="sub">검색 결과가 없습니다.</div>';
-  }
-  cf.addEventListener('click',function(e){var b=e.target.closest('button');if(b){city=b.dataset.c;render()}});
-  q.addEventListener('input',render);
-  pl.addEventListener('click',function(e){var b=e.target.closest('[data-copy]');if(b)copy(b.dataset.copy,'복사했습니다. 내비 앱에 붙여넣으세요.');var m=e.target.closest('[data-map]');if(m&&window.showOnMap){var x=cur[+m.dataset.map];window.showOnMap(x.name,x.q)}});
-  window.addEventListener('gmready',render);
-  render();
-})();
-
-/* ---------- 4. 준비·예산 ---------- */
-(function(){
-  var p=$('#p-prep');
-  var h='<div class="card"><h2>준비 체크</h2><div class="sub num" id="pc"></div><div class="prog"><i id="pb"></i></div><div id="cl"></div><div class="notice" id="np" hidden>이 브라우저는 체크를 저장하지 못합니다. 창을 닫기 전에 아래에서 JSON을 내보내 두세요.</div></div>';
-  h+='<div class="card"><h2>건강 관리와 시기별 준비</h2><ul class="plain"><li>하루 보행은 5~8km 이내로 잡습니다.</li><li>성벽과 계단은 오전에 둡니다.</li><li>출발 3~5개월 전 항공·호텔과 여권·보험, 2~4주 전 전용차량 시간, 1주 전 날씨·eSIM·현금·카드·객실 요청을 확인합니다.</li></ul></div>';
-  h+='<div class="card"><h2>예산 참고 범위</h2><div class="scroll"><table><tr><th>구분</th><th>원본 참고 범위</th></tr><tr><td>절약형</td><td class="num">580~785만원</td></tr><tr><td>권장형</td><td class="num">790~1,085만원</td></tr></table></div><p class="sub">확정 총액이 아닙니다. 항공, 숙박, 차량 견적을 날짜와 취소규정까지 확인한 뒤 다시 계산합니다. 원본은 부부 2인, 도어투도어 전용차량 기준이며 국제선, 숙박 7박, 전용차량, 식비·카페, 입장료·시내교통을 포함하고 쇼핑·여행자보험은 뺐습니다. 원본의 차량 3구간 표기는 실제 도시 간 4구간으로 바로잡았으므로 차량비는 재견적이 필요합니다.</p></div>';
-  h+='<div class="card"><h2>체크 백업 · 다른 기기로 옮기기</h2><p class="sub">자동 동기화가 아닙니다. 체크한 항목만 담기며 일정, 예약, 개인정보는 포함되지 않습니다.</p><div class="row" style="display:flex;gap:6px;flex-wrap:wrap;margin:8px 0"><button class="btn solid" id="bx" type="button">내보내기</button><button class="btn" id="bc" type="button">복사</button><label class="btn" for="bf">파일 선택</label><input id="bf" type="file" accept=".json,application/json" hidden><button class="btn" id="bv" type="button">내용 검사</button></div><textarea id="bj" aria-label="백업 JSON" placeholder="내보내기를 누르면 여기에 JSON이 나옵니다. 다른 기기에서는 JSON을 붙여넣고 내용 검사를 누르세요."></textarea><div id="bm" class="sub"></div><div id="ba" hidden style="display:none;gap:6px;flex-wrap:wrap;margin-top:8px"><button class="btn solid" id="bmg" type="button">완료 항목 합치기</button><button class="btn stone" id="brp" type="button">가져온 체크로 교체</button><button class="btn" id="bcn" type="button">취소</button></div></div>';
-  p.innerHTML=h;
-  var cl=$('#cl');
-  PREP.forEach(function(it){
-    var d=el('div',{class:'check'});
-    d.innerHTML='<input type="checkbox" id="ck-'+it[0]+'" data-id="'+it[0]+'"><label for="ck-'+it[0]+'">'+esc(it[1])+(it[2]?'<small>'+esc(it[2])+'</small>':'')+'</label>';
-    cl.appendChild(d);
+    const info = new google.maps.InfoWindow({
+      content: `<div style="font-family:'Noto Sans KR',sans-serif;max-width:220px;">
+        <div style="font-size:10.5px;color:${color};font-weight:700;margin-bottom:2px;">D${s.day} · ${CAT_LABEL[s.cat]}</div>
+        <div style="font-size:13.5px;font-weight:700;margin-bottom:3px;">${s.name}</div>
+        <div style="font-size:11.5px;color:#555;margin-bottom:4px;">${s.desc||''}</div>
+        <div style="font-size:11px;color:#888;">${s.addr}</div>
+      </div>`
+    });
+    marker.addListener('click', () => info.open({anchor:marker, map:gMap}));
+    marker._cat = s.cat; marker._day = s.day; marker._info = info;
+    bounds.extend({lat:s.lat, lng:s.lng});
+    return marker;
   });
-  function paint(){
-    PREP.forEach(function(it){$('#ck-'+it[0]).checked=!!checks[it[0]]});
-    var n=doneIds().length;$('#pc').textContent=n+' / '+IDS.length+' 완료';$('#pb').style.width=(n/IDS.length*100)+'%';
-    $('#np').hidden=persist;
-  }
-  cl.addEventListener('change',function(e){var i=e.target.dataset.id;if(!i)return;if(e.target.checked)checks[i]=1;else delete checks[i];save();paint()});
-  paint();
-  var ta=$('#bj'),msg=$('#bm'),act=$('#ba'),pending=null;
-  function mk(){return JSON.stringify({format:FMT,version:1,done:doneIds()},null,1)}
-  function clearPending(){pending=null;act.style.display='none'}
-  $('#bx').addEventListener('click',function(){ta.value=mk();msg.textContent='내보냈습니다. 복사하거나 다른 기기에 붙여넣으세요.';clearPending()});
-  $('#bc').addEventListener('click',function(){var t=ta.value||mk();ta.value=t;copy(t,'JSON을 복사했습니다.')});
-  $('#bf').addEventListener('change',function(e){var f=e.target.files[0];if(!f)return;if(f.size>MAXB){msg.textContent='파일이 너무 큽니다(20KB 제한).';return}var r=new FileReader();r.onload=function(){ta.value=String(r.result);check()};r.onerror=function(){msg.textContent='파일을 읽지 못했습니다. JSON을 직접 붙여넣어 주세요.'};r.readAsText(f);e.target.value=''});
-  function check(){
-    clearPending();var t=ta.value;
-    if(!t.trim()){msg.textContent='검사할 내용이 없습니다.';return}
-    if(new Blob([t]).size>MAXB){msg.textContent='내용이 20KB를 넘어 거절했습니다.';return}
-    var o;try{o=JSON.parse(t)}catch(e){msg.textContent='JSON 형식이 올바르지 않습니다.';return}
-    if(!o||o.format!==FMT||o.version!==1||!Array.isArray(o.done)){msg.textContent='이 앱의 백업 형식(버전 1)이 아닙니다.';return}
-    var bad=o.done.filter(function(i){return typeof i!=='string'||IDS.indexOf(i)<0});
-    if(bad.length){msg.textContent='알 수 없는 항목이 있어 거절했습니다.';return}
-    pending=o.done.filter(function(v,i,a){return a.indexOf(v)===i});
-    msg.textContent='정상입니다. 완료 '+pending.length+'개. 적용 방식을 선택하세요.';act.style.display='flex';
-  }
-  $('#bv').addEventListener('click',check);
-  $('#bmg').addEventListener('click',function(){if(!pending)return;pending.forEach(function(i){checks[i]=1});save();paint();msg.textContent='완료 항목을 합쳤습니다.';clearPending()});
-  $('#brp').addEventListener('click',function(){if(!pending)return;checks={};pending.forEach(function(i){checks[i]=1});save();paint();msg.textContent='가져온 체크로 교체했습니다.';clearPending()});
-  $('#bcn').addEventListener('click',function(){clearPending();msg.textContent='취소했습니다. 변경 없음.'});
-})();
+  gMap.fitBounds(bounds, 40);
+}
 
-/* ---------- 5. 검증 ---------- */
-(function(){
-  var p=$('#p-check');
-  var fix=[
-   ['박수와 출국일','7박 표기와 달리 도시별 숙박 합계가 8박이었음','자그레브 1박으로 줄여 7박, D8 출국 분리'],
-   ['관광일 압축','기간을 줄이며 기존 관광일을 전부 유지할 수 없음','D2에 자그레브 관광과 라스토케 이동을 합치고 선택 항목으로 표시'],
-   ['차량 구간','예산의 3구간이 실제 4구간과 불일치','D2·D3·D4·D6 4구간, 재견적 필요'],
-   ['예산','확인 전 범위를 확정 총액처럼 쓰면 위험','참고 범위로만 표시'],
-   ['주소와 지도','좌표와 실제 입구 일치가 검증되지 않음','5곳 공식 확인, 좌표 마커 대신 검색 링크, 25곳 미검증 표시'],
-   ['여행 시기','원본은 10월 하순~11월 초 비수기를 가정','2027년 1월 겨울 일정으로 재검토'],
-   ['이동수단 표기','차량 구간을 렌터카·운전으로 오해하기 쉬움','도어투도어 전용차량 기준으로 통일, 렌터카는 비권장'],
-   ['플리트비체 계절 설명','할인 설명에 11월 성수기라고 쓰여 같은 페이지의 비수기 설명과 모순','겨울 개방 안내 기준으로 바꾸고 계절 단정 삭제'],
-   ['운영시간 기준','성벽 동계 09:00~15:00과 Panorama 11월 09:00~17:00의 기준이 서로 다름','2027년 1월 시간은 미확인으로 두고 직전 재확인'],
-   ['숙소','두브로브니크 숙소가 Hilton Imperial로 되어 있었고 공식 페이지 확인에 실패','주소 확인된 Lero를 후보로 두고 Hilton은 미검증 옵션으로 병기'],
-   ['이동·소개 문구','도보 시간, 배차, 성벽 중도 출구 등 단정','단정 삭제, 당일 확인 안내']
-  ];
-  var winter=[
-   ['케이블카 / Panorama','공식 월별표 모두 1월 휴업. 2027년 예외 영업은 미확인','D7 제외','https://www.dubrovnikcablecar.com/timetable-and-prices/'],
-   ['플리트비체','공식 FAQ상 겨울에 보통 하부호수 개방, 상부호수 폐쇄','D3 짧은 코스로 검토','https://np-plitvicka-jezera.hr/en/faq/'],
-   ['두브로브니크 성벽','12월 25일 외 연중 운영. 2027년 1월 시간 미확인','09:00 가정 삭제','https://citywallsdubrovnik.hr/faq/'],
-   ['일조','자다르 2027년 1월 10~17일 일몰 약 16:40~16:48','오후 일정에 여유','https://www.timeanddate.com/sun/croatia/zadar?month=1&year=2027'],
-   ['말리 스톤','Bota Šare 장소는 확인, 2027년 1월 영업과 예약은 미확인','불가 시 생략','https://www.bota-sare.hr/en/mali-ston'],
-   ['흐바르 페리','본 일정에 페리 없음. 2027년 시간표 미확인','일정에서 제외','https://www.jadrolinija.hr/en/travel/split-hvar'],
-   ['호텔 / 식당','방문일 객실·좌석·겨울 영업은 확인 전. Lero 수영장은 5/1~10/1 운영','수영장 제외','https://hotel-lero.hr/']
-  ];
-  var h='<div class="notice">이 앱은 실제 예약이나 운영 확정을 뜻하지 않습니다. 아래 내용은 2026-10-08에 읽은 공식 안내 기준이며, 항공편 확정 후 방문 직전과 당일 운영 공지를 다시 확인하세요.</div>';
-  h+='<div class="card"><h2>원본에서 바로잡은 것</h2><div class="scroll"><table><tr><th>항목</th><th>문제</th><th>수정</th></tr>';
-  fix.forEach(function(f){h+='<tr><td>'+esc(f[0])+'</td><td>'+esc(f[1])+'</td><td>'+esc(f[2])+'</td></tr>'});
-  h+='</table></div></div><div class="card"><h2>2027년 1월 겨울 재검토</h2><div class="scroll"><table><tr><th>대상</th><th>확인한 내용</th><th>일정 반영</th><th>출처</th></tr>';
-  winter.forEach(function(w){h+='<tr><td>'+esc(w[0])+'</td><td>'+esc(w[1])+'</td><td>'+esc(w[2])+'</td><td><a href="'+w[3]+'" target="_blank" rel="noopener">열기</a></td></tr>'});
-  var rv=[
-   ['케이블카 1월 휴업','일치','월별표에서 1~3월, 12월 휴업. 표에 연도가 적혀 있지 않아 2027년 예외는 운영사 확인 필요'],
-   ['Panorama 1월 휴업','일치','1월 전체와 2월, 12월 휴업. 연도 미표시'],
-   ['플리트비체 겨울 하부호수','일치','FAQ는 하부호수 보통 개방, 상부호수 폐쇄, 보통 4월 초 재개방. 겨울 보트·열차·입구 운영은 FAQ에 없음'],
-   ['플리트비체 현재 시간표','보완','공원은 연중 무휴이나 현재 표(입구 07:00~18:00, 매표 15:00까지)는 연도·계절이 불명확해 1월에 쓰지 않음. 겨울엔 대부분 편의시설 휴업, 숙박은 Hotel Jezero만 가능'],
-   ['두브로브니크 성벽','일치','12월 25일만 휴무. 겨울은 11/1~3/31이나 이 FAQ에는 시간이 없고, 마감시각이 곧 마지막 입장시각'],
-   ['자다르 일몰','계산으로 대체','timeanddate 접속이 막혀 직접 계산: 1/10~17 약 16:39~16:47(현지). PDF의 16:40~16:48과 1분 안팎 차이'],
-   ['말리 스톤 Bota Šare','일치','장소는 확인. 영업시간 미게시라 1월 영업은 전화·이메일로 확인(+385 20 754-482)'],
-   ['Split-Hvar 페리','일치','페이지가 2026표. 2027표 게시 여부 불명'],
-   ['Lero 수영장','일치','5/1~10/1 운영. 주소 Iva Vojnovića 14. 1월 호텔 운영 여부는 미게시, reception@hotel-lero.hr로 확인']
-  ];
-  h+='</table></div></div><div class="card"><h2>PDF 재검증 결과 (2026-10-08)</h2><p class="sub">PDF의 출처를 다시 열어 대조했습니다. 2027년 1월 운영이 확정된 것은 아닙니다.</p><div class="scroll"><table><tr><th>PDF 내용</th><th>결과</th><th>메모</th></tr>';
-  rv.forEach(function(r){h+='<tr><td>'+esc(r[0])+'</td><td>'+esc(r[1])+'</td><td>'+esc(r[2])+'</td></tr>'});
-  h+='</table></div></div><div class="card"><h2>예약 전에 남은 확인</h2><ul class="plain"><li>항공편, 현지 도착일, D1~D8 날짜, 한국 도착일</li><li>호텔 7박, 식당 영업, 차량 4구간 견적, 입장시간, 취소조건, 전체 예산</li><li>미검증 25개 주소와 실제 입구, 공원 결빙과 코스 개방</li><li>체크 백업의 실제 기기별 파일 저장과 가져오기는 아직 테스트하지 못했습니다.</li></ul></div>';
-  p.innerHTML=h;
-})();
+function applyLegendFilter(){
+  gMarkers.forEach(m => { m.map = activeCats.has(m._cat) ? gMap : null; });
+}
 
-/* ---------- 테마 ---------- */
-$('#themeBtn').addEventListener('click',function(){
-  var r=document.documentElement,c=r.getAttribute('data-theme');
-  var dark=c?c==='dark':window.matchMedia('(prefers-color-scheme: dark)').matches;
-  r.setAttribute('data-theme',dark?'light':'dark');
+document.getElementById('legendRow').addEventListener('click', (e) => {
+  const chip = e.target.closest('.legend-chip');
+  if(!chip) return;
+  const t = chip.getAttribute('data-type');
+  if(activeCats.has(t)){ activeCats.delete(t); chip.classList.add('off'); }
+  else { activeCats.add(t); chip.classList.remove('off'); }
+  applyLegendFilter();
 });
 
-load();
-(function(){var n='route';try{n=sessionStorage.getItem('ct-tab')||'route'}catch(e){}if(!TABS.some(function(t){return t[0]===n}))n='route';show(n);window.scrollTo(0,0)})();
-})();
+function focusDay(n){
+  document.getElementById('map').scrollIntoView({behavior:'smooth', block:'start'});
+  if(!gMap || !gMarkers.length) return;
+  const dayMarkers = gMarkers.filter(m => m._day === n);
+  if(!dayMarkers.length) return;
+  const bounds = new google.maps.LatLngBounds();
+  dayMarkers.forEach(m => bounds.extend(m.position));
+  gMap.fitBounds(bounds, 60);
+  setTimeout(() => { if(gMap.getZoom() > 14) gMap.setZoom(14); }, 300);
+  setTimeout(() => dayMarkers[0]._info.open({anchor:dayMarkers[0], map:gMap}), 450);
+}
+
+// generic copy handler for both master table and inline addr-rows
+function copyAddr(btn){
+  const addr = btn.getAttribute('data-addr');
+  const done = () => {
+    const original = btn.textContent;
+    btn.textContent = '복사됨 ✓';
+    btn.classList.add('copied');
+    setTimeout(()=>{ btn.textContent = original; btn.classList.remove('copied'); }, 1500);
+  };
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(addr).then(done).catch(()=>{ fallbackCopy(addr); done(); });
+  } else {
+    fallbackCopy(addr); done();
+  }
+}
+function fallbackCopy(text){
+  const ta = document.createElement('textarea');
+  ta.value = text; ta.style.position='fixed'; ta.style.opacity='0';
+  document.body.appendChild(ta); ta.focus(); ta.select();
+  try{ document.execCommand('copy'); }catch(e){}
+  document.body.removeChild(ta);
+}
 </script>
-</body></html>
+</body>
+</html>
